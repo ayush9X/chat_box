@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import axios from "axios";
-import { Send, Users, Hash, Plus, Menu, X } from "lucide-react";
+import { Send, Users, Hash, Plus, Menu } from "lucide-react";
 
 // ✅ Connect to backend socket
 const socket = io("https://chatbackendd-3.onrender.com");
@@ -75,12 +75,34 @@ const ChatApp = () => {
       }));
 
       setGroups(formattedGroups);
+
       if (formattedGroups.length > 0) {
-        setActiveGroup(formattedGroups[0]); // set first group active by default
-        setGroups((prev) => prev.map((g, i) => ({ ...g, active: i === 0 })));
+        const firstGroup = formattedGroups[0];
+        setActiveGroup(firstGroup);
+        setGroups((prev) =>
+          prev.map((g, i) => ({ ...g, active: i === 0 }))
+        );
+        await fetchChats(firstGroup.id); // ✅ fetch chats for first group
       }
     } catch (err) {
       console.error("Error fetching groups:", err);
+    }
+  };
+
+  // ✅ Fetch chats for a group
+  const fetchChats = async (groupId) => {
+    try {
+      const res = await axios.get(
+        `https://chatbackendd-3.onrender.com/user/chat?groupID=${groupId}`
+      );
+      if (res.data && Array.isArray(res.data.chats)) {
+        setMessages(res.data.chats);
+      } else {
+        setMessages([]);
+      }
+    } catch (err) {
+      console.error("❌ Error fetching chats:", err);
+      setMessages([]);
     }
   };
 
@@ -91,7 +113,6 @@ const ChatApp = () => {
   // ✅ Listen for new messages
   useEffect(() => {
     socket.on("receive_message", (msg) => {
-      // only add messages for the active group
       if (activeGroup && msg.groupID === activeGroup.id) {
         setMessages((prev) => [...prev, msg]);
       }
@@ -139,10 +160,11 @@ const ChatApp = () => {
   };
 
   // ✅ Set active group on click
-  const handleGroupClick = (index) => {
+  const handleGroupClick = async (index) => {
+    const selectedGroup = groups[index];
     setGroups((prev) => prev.map((g, i) => ({ ...g, active: i === index })));
-    setActiveGroup(groups[index]);
-    setMessages([]); // clear messages for new group
+    setActiveGroup(selectedGroup);
+    await fetchChats(selectedGroup.id); // ✅ load chats for clicked group
   };
 
   return (
