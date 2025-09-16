@@ -40,7 +40,7 @@ const SlackLogin = () => {
       console.log("Login Response:", res.data);
 
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/chat");
       }, 1500);
     } catch (err) {
       setMessage(

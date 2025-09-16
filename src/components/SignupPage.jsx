@@ -71,7 +71,7 @@ const SignupPage = () => {
 
       // ✅ Redirect to dashboard after success
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/chat");
       }, 1500);
     } catch (err) {
       setMessage(

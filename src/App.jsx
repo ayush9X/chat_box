@@ -10,7 +10,7 @@ const App = () => {
       <Routes>
         {/* <Route path="/dashboard" element={<ChatApp />} /> */}
         <Route path="/login" element={<SlackLogin />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/" element={<SignupPage />} />
         <Route path="/chat" element={<ChatApp />} />
       </Routes>
     </>
