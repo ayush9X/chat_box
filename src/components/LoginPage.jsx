@@ -25,7 +25,7 @@ const SlackLogin = () => {
 
     try {
       const res = await axios.post(
-        "https://wzl6mwg3-5000.inc1.devtunnels.ms/user/login",
+        "https://chatbackendd-3.onrender.com/user/login",
         formData,
         {
           headers: { "Content-Type": "application/json" },

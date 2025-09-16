@@ -36,7 +36,7 @@ export default function ChatApp() {
 
     try {
       const res = await axios.post(
-        "https://wzl6mwg3-5000.inc1.devtunnels.ms/user/chat",
+        "https://chatbackendd-3.onrender.com/user/chat",
         {
           userID: userID,
           message: input,

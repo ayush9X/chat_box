@@ -1,19 +1,28 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
-import ChatApp from "./components/ChatApp";
-import SlackLogin from "./components/LoginPage"
+import { Routes, Route } from "react-router-dom";
+import SlackLogin from "./components/LoginPage";
 import SignupPage from "./components/SignupPage";
+import ChatApp from "./components/ChatApp";
+import AdminLayout from "./components/Admin";
+import PostsPage from "./components/PostsPage";
+import GroupsPage from "./components/GroupsPage";
+import UsersPage from "./components/UsersPage";
 
 const App = () => {
   return (
-    <>
-      <Routes>
-        {/* <Route path="/dashboard" element={<ChatApp />} /> */}
-        <Route path="/login" element={<SlackLogin />} />
-        <Route path="/" element={<SignupPage />} />
-        <Route path="/chat" element={<ChatApp />} />
-      </Routes>
-    </>
+    <Routes>
+      <Route path="/" element={<SignupPage />} />
+      <Route path="/login" element={<SlackLogin />} />
+      <Route path="/chat" element={<ChatApp />} />
+
+      {/* Admin routes */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route path="posts" element={<PostsPage />} />
+        <Route path="groups" element={<GroupsPage />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route index element={<PostsPage />} /> {/* default tab */}
+      </Route>
+    </Routes>
   );
 };
 
