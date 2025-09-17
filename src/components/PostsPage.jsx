@@ -6,7 +6,6 @@ import {
   Search,
   Filter,
   Image,
-  Link,
   Calendar,
   Eye,
   Edit2,
@@ -22,6 +21,7 @@ import {
   MessageCircle,
   Share2,
 } from "lucide-react";
+import { linked } from "./link";
 
 const PostsPage = () => {
   const [image, setImage] = useState(null);
@@ -73,8 +73,9 @@ const PostsPage = () => {
     try {
       setFetchLoading(true);
       const res = await axios.get(
-        `${link}/user/post`
+        `${linked}/user/post`
       );
+
 
       let fetchedPosts = [];
       if (Array.isArray(res.data.post)) {

@@ -64,6 +64,7 @@ const SignupPage = () => {
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.user.id);
+      localStorage.setItem("username", res.data.user.username);
 
       setMessage("✅ Signup successful! Redirecting...");
       console.log("API Response:", res.data);

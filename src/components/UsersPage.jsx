@@ -21,6 +21,7 @@ import {
   UserX,
   Clock,
 } from "lucide-react";
+import { linked } from "./link";
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
@@ -76,7 +77,7 @@ const UsersPage = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${link}/user/allusers`
+        `${linked}/user/allusers`
       );
       const data = await response.json();
 

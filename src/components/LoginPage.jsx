@@ -36,6 +36,8 @@ const SlackLogin = () => {
       // ✅ Save token & userId in localStorage
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.user.id);
+      localStorage.setItem("username", res.data.user.username);
+
 
       setMessage("✅ Login successful! Redirecting...");
       console.log("Login Response:", res.data);
