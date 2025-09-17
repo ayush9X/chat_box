@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import axios from "axios";
+import { link } from "./link";
 
 const socket = io("https://wzl6mwg3-5000.inc1.devtunnels.ms"); // your backend URL
 
@@ -36,7 +37,7 @@ export default function ChatApp() {
 
     try {
       const res = await axios.post(
-        "https://chatbackendd-3.onrender.com/user/chat",
+        `${link}/user/chat`,
         {
           userID: userID,
           message: input,

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import { Outlet, useLocation } from "react-router-dom";
+import { link } from "./link";
 import {
   Bell,
   Search,

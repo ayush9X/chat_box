@@ -73,7 +73,7 @@ const PostsPage = () => {
     try {
       setFetchLoading(true);
       const res = await axios.get(
-        "https://chatbackendd-3.onrender.com/user/post"
+        `${link}/user/post`
       );
 
       let fetchedPosts = [];
@@ -156,7 +156,7 @@ const PostsPage = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "https://chatbackendd-3.onrender.com/user/post",
+        `${link}/user/post`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -189,7 +189,7 @@ const PostsPage = () => {
     try {
       setLoading(true);
       // Add your delete API call here
-      // await axios.delete(`https://chatbackendd-3.onrender.com/user/post/${postId}`);
+      // await axios.delete(`https://chat-ohmw.onrender.com/user/post/${postId}`);
 
       // For now, delete locally
       setPosts((prev) => prev.filter((post) => post.id !== postId));

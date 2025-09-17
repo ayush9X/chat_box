@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
+import { link } from "./link";
 
 const SlackLogin = () => {
   const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ const SlackLogin = () => {
 
     try {
       const res = await axios.post(
-        "https://chatbackendd-3.onrender.com/user/login",
+        `${link}/user/login`,
         formData,
         {
           headers: { "Content-Type": "application/json" },

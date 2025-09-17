@@ -14,6 +14,7 @@ import {
   MoreVertical,
   Filter,
 } from "lucide-react";
+import { link } from "./link";
 
 const GroupsPage = () => {
   const [chatTitle, setChatTitle] = useState("");
@@ -33,7 +34,7 @@ const GroupsPage = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        "https://chatbackendd-3.onrender.com/user/group"
+        `${link}/user/group`
       );
       console.log("Groups fetched:", res.data);
 
@@ -118,7 +119,7 @@ const GroupsPage = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "https://chatbackendd-3.onrender.com/user/group",
+        `${link}/user/group`,
         { chatTitle: chatTitle.trim() }
       );
 
@@ -161,7 +162,7 @@ const GroupsPage = () => {
     try {
       setLoading(true);
       // Add your update API call here
-      // const res = await axios.put(`https://chatbackendd-3.onrender.com/user/group/${editingGroup.id}`, { chatTitle });
+      // const res = await axios.put(`https://chat-ohmw.onrender.com/user/group/${editingGroup.id}`, { chatTitle });
 
       // For now, update locally
       setGroups((prev) =>
@@ -188,7 +189,7 @@ const GroupsPage = () => {
     try {
       setLoading(true);
       // Add your delete API call here
-      // await axios.delete(`https://chatbackendd-3.onrender.com/user/group/${groupId}`);
+      // await axios.delete(`https://chat-ohmw.onrender.com/user/group/${groupId}`);
 
       // For now, delete locally
       setGroups((prev) => prev.filter((group) => group.id !== groupId));

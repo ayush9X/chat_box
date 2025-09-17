@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom"; // ✅ Added Link
 import axios from "axios";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
+import { link } from "./link";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -54,7 +55,7 @@ const SignupPage = () => {
 
     try {
       const res = await axios.post(
-        "https://chatbackendd-3.onrender.com/user/signup",
+        `${link}/user/signup`,
         formData,
         {
           headers: { "Content-Type": "application/json" },

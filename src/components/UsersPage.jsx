@@ -76,7 +76,7 @@ const UsersPage = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://chatbackendd-3.onrender.com/user/allusers"
+        `${link}/user/allusers`
       );
       const data = await response.json();
 

@@ -1,15 +1,68 @@
 import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import axios from "axios";
-import { Send, Users, Hash, Plus, Menu } from "lucide-react";
+import { Send, Users, Hash, Plus, Menu, Wifi, WifiOff } from "lucide-react";
+import { link } from "./link";
+
 
 // ✅ Connect to backend socket
-const socket = io("https://chatbackendd-3.onrender.com", {
-  transports: ["websocket", "polling"], // Ensure both transports are available
-  reconnection: true,
-  reconnectionAttempts: 5,
-  reconnectionDelay: 1000,
-});
+const sendMessageToServer = async (message, groupID) => {
+  try {
+    const response = await fetch(`${link}/user/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userID,
+        groupID: groupID || activeGroup.id,
+        message: message,
+      }),
+    });
+
+    if (response.ok) {
+      console.log("✅message successfully");
+      return true;
+    } else {
+      console.error("❌ Send chat failed: HTTP", response.status);
+      return false;
+    }
+  } catch (err) {
+    console.error("❌ Send chat failed:", err);
+    return false;
+  }
+};
+
+// Import socket.io-client from CDN
+const script = document.createElement("script");
+script.src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js";
+script.async = true;
+
+script.onload = () => {
+  if (window.io) {
+    socket = window.io("https://chatbackendd-3.onrender.com", {
+      transports: ["websocket", "polling"],
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 2000,
+      timeout: 20000,
+    });
+
+    socket.on("connect", () => {
+      console.log("🔌 Connected to server via Socket.IO");
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("⚠️ Socket connection error:", err);
+    });
+  }
+};
+
+document.head.appendChild(script);
+
+// Global socket reference
+let socket = null;
+
 
 const ChatApp = () => {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -19,6 +72,7 @@ const ChatApp = () => {
   const [groups, setGroups] = useState([]);
   const [activeGroup, setActiveGroup] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [pendingMessages, setPendingMessages] = useState([]);
   const messagesEndRef = useRef(null);
 
   const [users] = useState([
@@ -63,55 +117,92 @@ const ChatApp = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Initialize user ID in memory (no localStorage)
   useEffect(() => {
-    const storedUserId = localStorage.getItem("userId");
-    if (storedUserId) {
-      setUserID(storedUserId);
-    } else {
-      const tempUserId = `user_${Date.now()}_${Math.random()
-        .toString(36)
-        .substr(2, 9)}`;
-      localStorage.setItem("userId", tempUserId);
-      setUserID(tempUserId);
-    }
+    const tempUserId = `user_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+    setUserID(tempUserId);
+    console.log("🆔 Generated User ID:", tempUserId);
   }, []);
 
+  // Enhanced socket connection handling
   useEffect(() => {
-    const handleConnect = () => {
-      console.log("🔌 Socket connected:", socket.id);
-      setIsConnected(true);
+    const setupSocketListeners = () => {
+      if (!socket) return;
+
+      const handleConnect = () => {
+        console.log("🔌 Socket connected:", socket.id);
+        setIsConnected(true);
+        
+        // Send any pending messages when reconnected
+        if (pendingMessages.length > 0) {
+          console.log("📤 Sending pending messages:", pendingMessages.length);
+          pendingMessages.forEach(msg => {
+            sendMessageToServer(msg.message, msg.groupID);
+          });
+          setPendingMessages([]);
+        }
+      };
+
+      const handleDisconnect = (reason) => {
+        console.log("🔌 Socket disconnected:", reason);
+        setIsConnected(false);
+      };
+
+      const handleConnectError = (error) => {
+        console.error("🔌 Socket connection error:", error);
+        setIsConnected(false);
+      };
+
+      const handleReconnect = (attemptNumber) => {
+        console.log("🔄 Socket reconnected after", attemptNumber, "attempts");
+        setIsConnected(true);
+      };
+
+      const handleReconnectAttempt = (attemptNumber) => {
+        console.log("🔄 Attempting to reconnect...", attemptNumber);
+      };
+
+      socket.on("connect", handleConnect);
+      socket.on("disconnect", handleDisconnect);
+      socket.on("connect_error", handleConnectError);
+      socket.on("reconnect", handleReconnect);
+      socket.on("reconnect_attempt", handleReconnectAttempt);
+
+      // Initial connection check
+      setIsConnected(socket.connected);
+
+      return () => {
+        socket.off("connect", handleConnect);
+        socket.off("disconnect", handleDisconnect);
+        socket.off("connect_error", handleConnectError);
+        socket.off("reconnect", handleReconnect);
+        socket.off("reconnect_attempt", handleReconnectAttempt);
+      };
     };
 
-    const handleDisconnect = () => {
-      console.log("🔌 Socket disconnected");
-      setIsConnected(false);
+    // Setup listeners when socket is available
+    const checkSocket = () => {
+      if (socket) {
+        return setupSocketListeners();
+      } else {
+        setTimeout(checkSocket, 500);
+      }
     };
 
-    const handleConnectError = (error) => {
-      console.error("🔌 Socket connection error:", error);
-      setIsConnected(false);
-    };
-
-    socket.on("connect", handleConnect);
-    socket.on("disconnect", handleDisconnect);
-    socket.on("connect_error", handleConnectError);
-
-    return () => {
-      socket.off("connect", handleConnect);
-      socket.off("disconnect", handleDisconnect);
-      socket.off("connect_error", handleConnectError);
-    };
-  }, []);
+    checkSocket();
+  }, [pendingMessages]);
 
   const fetchGroups = async () => {
     try {
-      const res = await axios.get(
-        "https://chatbackendd-3.onrender.com/user/group"
-      );
-      const fetchedGroups = Array.isArray(res.data.groups)
-        ? res.data.groups
-        : Array.isArray(res.data.group)
-        ? res.data.group
+      const response = await fetch(`${link}/user/group`);
+      const data = await response.json();
+      
+      const fetchedGroups = Array.isArray(data.groups)
+        ? data.groups
+        : Array.isArray(data.group)
+        ? data.group
         : [];
 
       const formattedGroups = fetchedGroups.map((g) => ({
@@ -132,18 +223,28 @@ const ChatApp = () => {
       }
     } catch (err) {
       console.error("Error fetching groups:", err);
+      // Demo fallback data
+      const demoGroups = [
+        { id: '1', name: 'General', icon: '#', active: true, unread: 0 },
+        { id: '2', name: 'Random', icon: '#', active: false, unread: 2 },
+        { id: '3', name: 'Tech Talk', icon: '#', active: false, unread: 0 },
+      ];
+      setGroups(demoGroups);
+      setActiveGroup(demoGroups[0]);
     }
   };
 
   const fetchChats = async (groupId) => {
     try {
-      console.log(`📥 Fetching chats from API for group: ${groupId}`);
-      const res = await axios.get(
-        `https://chatbackendd-3.onrender.com/user/chat?groupID=${groupId}`
+      console.log("📥 Fetching chats from API for group: ${groupId}");
+      const response = await fetch(
+        `${link}/user/chat?groupID=${groupId}`
       );
-      if (res.data && Array.isArray(res.data.chats)) {
-        const sortedChats = [...res.data.chats].sort(
-          (a, b) => new Date(a.chat_at) - new Date(b.chat_at) // oldest → latest
+      const data = await response.json();
+      
+      if (data && Array.isArray(data.chats)) {
+        const sortedChats = [...data.chats].sort(
+          (a, b) => new Date(a.chat_at) - new Date(b.chat_at)
         );
         setMessages(sortedChats);
         console.log(`✅ Loaded ${sortedChats.length} messages from API`);
@@ -153,7 +254,20 @@ const ChatApp = () => {
       }
     } catch (err) {
       console.error("❌ Error fetching chats:", err);
-      setMessages([]);
+      // Demo fallback messages
+      const demoMessages = [
+        {
+          sender: 'user_demo_1',
+          chat: 'Welcome to the chat!',
+          chat_at: new Date(Date.now() - 3600000).toISOString()
+        },
+        {
+          sender: 'user_demo_2',
+          chat: 'Thanks! This looks great.',
+          chat_at: new Date(Date.now() - 1800000).toISOString()
+        }
+      ];
+      setMessages(demoMessages);
     }
   };
 
@@ -162,7 +276,7 @@ const ChatApp = () => {
   }, []);
 
   useEffect(() => {
-    if (!activeGroup) return;
+    if (!activeGroup || !socket) return;
 
     const room = `group_${activeGroup.id}`;
     console.log(`🏠 Joining room: ${room}`);
@@ -180,19 +294,69 @@ const ChatApp = () => {
     };
   }, [activeGroup]);
 
+  const sendMessageToServer = async (message, groupID) => {
+    try {
+      await axios.post(`${link}user/chat`, {
+        userID,
+        groupID: groupID || activeGroup.id,
+        message: message,
+      });
+      console.log("message success.");
+      return true;
+    } catch (err) {
+      console.error("❌ Send chat failed:", err);
+      return false;
+    }
+  };
+
   const sendMessage = async () => {
     if (!currentMessage.trim() || !userID || !activeGroup) return;
 
-    try {
-      await axios.post("https://chatbackendd-3.onrender.com/user/chat", {
-        userID,
+    const messageData = {
+      sender: userID,
+      chat: currentMessage.trim(),
+      chat_at: new Date().toISOString(),
+      groupID: activeGroup.id,
+      status: isConnected ? 'sending' : 'pending'
+    };
+
+    // Add message to UI immediately for better UX
+    setMessages(prev => [...prev, messageData]);
+    const messageText = currentMessage.trim();
+    setCurrentMessage("");
+
+    if (isConnected) {
+      // Try to send immediately if connected
+      const success = await sendMessageToServer(messageText, activeGroup.id);
+      if (success) {
+        // Update message status to sent
+        setMessages(prev => prev.map(msg => 
+          msg.chat === messageData.chat && msg.chat_at === messageData.chat_at 
+            ? {...msg, status: 'sent'} 
+            : msg
+        ));
+      } else {
+        // If send failed, add to pending queue and update status
+        setPendingMessages(prev => [...prev, {
+          message: messageText,
+          groupID: activeGroup.id,
+          timestamp: Date.now()
+        }]);
+        
+        setMessages(prev => prev.map(msg => 
+          msg.chat === messageData.chat && msg.chat_at === messageData.chat_at 
+            ? {...msg, status: 'failed'} 
+            : msg
+        ));
+      }
+    } else {
+      // Add to pending queue if not connected
+      setPendingMessages(prev => [...prev, {
+        message: messageText,
         groupID: activeGroup.id,
-        message: currentMessage,
-      });
-      setCurrentMessage("");
-      console.log("✅ Message sent successfully");
-    } catch (err) {
-      console.error("❌ Send chat failed:", err);
+        timestamp: Date.now()
+      }]);
+      console.log("📤 Message queued for sending when connected");
     }
   };
 
@@ -221,7 +385,7 @@ const ChatApp = () => {
     setGroups((prev) => prev.map((g, i) => ({ ...g, active: i === index })));
     setActiveGroup(selectedGroup);
 
-    console.log(`📥 Fetching messages for group: ${selectedGroup.name}`);
+    console.log("📥 Fetching messages for group: ${selectedGroup.name}");
     await fetchChats(selectedGroup.id);
   };
 
@@ -234,6 +398,14 @@ const ChatApp = () => {
     } catch {
       return "";
     }
+  };
+
+  const getMessageStatusIcon = (msg) => {
+    if (msg.status === 'pending') return '🕐';
+    if (msg.status === 'sending') return '⏳';
+    if (msg.status === 'failed') return '❌';
+    if (msg.status === 'sent') return '✓';
+    return '';
   };
 
   return (
@@ -260,12 +432,17 @@ const ChatApp = () => {
                   : "bg-red-500/20 text-red-300"
               }`}
             >
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  isConnected ? "bg-green-400" : "bg-red-400"
-                }`}
-              ></div>
+              {isConnected ? (
+                <Wifi className="w-4 h-4" />
+              ) : (
+                <WifiOff className="w-4 h-4" />
+              )}
               {isConnected ? "Connected" : "Disconnected"}
+              {pendingMessages.length > 0 && (
+                <span className="ml-2 bg-yellow-500 text-yellow-900 px-2 py-0.5 rounded text-xs">
+                  {pendingMessages.length} pending
+                </span>
+              )}
             </div>
             <button className="bg-white text-purple-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-all shadow-xl text-lg">
               Upgrade Now
@@ -352,6 +529,11 @@ const ChatApp = () => {
                       <span className="text-xs text-gray-400">
                         {formatTime(msg.chat_at)}
                       </span>
+                      {msg.sender === userID && (
+                        <span className="text-xs">
+                          {getMessageStatusIcon(msg)}
+                        </span>
+                      )}
                     </div>
                     <p className="text-gray-200 break-words">{msg.chat}</p>
                   </div>
@@ -370,23 +552,34 @@ const ChatApp = () => {
                 onChange={(e) => setCurrentMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={
-                  isConnected ? "Type your message..." : "Connecting..."
+                  isConnected 
+                    ? "Type your message..." 
+                    : "Type your message (will send when connected)..."
                 }
-                disabled={!isConnected}
-                className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none disabled:opacity-50"
+                className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none"
               />
               <button
                 onClick={sendMessage}
-                disabled={!isConnected || !currentMessage.trim()}
-                className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                disabled={!currentMessage.trim() || !userID || !activeGroup}
+                className={`p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                  isConnected
+                    ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    : "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
+                }`}
+                title={isConnected ? "Send message" : "Queue message for sending when connected"}
               >
                 <Send className="w-5 h-5 text-white" />
               </button>
             </div>
+            {!isConnected && (
+              <p className="text-yellow-400 text-xs mt-2 text-center">
+                You're offline. Messages will be sent when connection is restored.
+              </p>
+            )}
           </div>
         </div>
 
-        {/* --- Right Sidebar: Groups --- */}
+        {/* Right Sidebar: Groups */}
         <div className="hidden md:block w-64 bg-slate-800/80 backdrop-blur-xl border-l border-purple-500/20">
           <div className="p-4 border-b border-gray-700/50">
             <h3 className="text-white font-semibold flex items-center gap-2">
