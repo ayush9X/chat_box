@@ -247,7 +247,7 @@ const ChatApp = () => {
 
     const handleMessage = (msg) => {
       console.log("📨 Real-time message received:", msg);
-      console.log(typeof(msg.sender), msg.sender)
+      console.log(typeof msg.sender, msg.sender);
 
       if (String(msg.sender) == String(username)) {
         console.log("⏩ Skipping my own echoed message");
@@ -387,7 +387,7 @@ const ChatApp = () => {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 py-10 px-6 text-white relative">
+      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 py-10 px-6 text-white relative hidden lg:block">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
           <div className="flex items-center space-x-4">
@@ -428,7 +428,7 @@ const ChatApp = () => {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
+      <div className="flex flex-1 overflow-y-auto flex-col md:flex-row">
         <div className="hidden md:block w-64 bg-slate-800/80 backdrop-blur-xl border-r border-purple-500/20">
           <div className="p-4 border-b border-gray-700/50">
             <h3 className="text-white font-semibold flex items-center gap-2">
@@ -462,7 +462,8 @@ const ChatApp = () => {
         </div>
 
         <div className="flex-1 flex flex-col bg-slate-900/50">
-          <div className="p-4 bg-slate-800/50 backdrop-blur-xl border-b border-purple-500/20 flex items-center justify-between">
+          {/* 🔹 Chat Header (Sticky on Mobile & Desktop) */}
+          <div className="sticky top-0 z-30 p-4 bg-slate-800/50 backdrop-blur-xl border-b border-purple-500/20 flex items-center justify-between">
             <div className="flex items-center gap-2 md:gap-3">
               <Hash className="w-6 h-6 text-purple-400" />
               <h2 className="text-lg md:text-xl font-bold text-white">
@@ -479,46 +480,6 @@ const ChatApp = () => {
               <Menu className="w-6 h-6 text-gray-300" />
             </button>
           </div>
-
-          {/* <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
-            {messages.length === 0 ? (
-              <p className="text-gray-400 text-center">
-                No messages yet. Start the conversation! 💬
-              </p>
-            ) : (
-              messages.map((msg, idx) => (
-                <div
-                  key={`${msg.sender}-${msg.chat_at}-${idx}`}
-                  className={`flex items-start gap-3 p-3 rounded-lg max-w-[80%] transition-all duration-200 ${
-                    msg.sender === userID
-                      ? "bg-purple-800/40 ml-auto"
-                      : "hover:bg-slate-800/30"
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white">
-                    👤
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-white">
-                        {msg.sender === userID ? "You" : msg.sender}
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        {formatTime(msg.chat_at)}
-                      </span>
-                      {msg.sender === userID && (
-                        <span className="text-xs">
-                          {getMessageStatusIcon(msg)}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-gray-200 break-words">{msg.chat}</p>
-                  </div>
-                </div>
-              ))
-            )}
-            <div ref={messagesEndRef} />
-          </div> */}
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
             {messages.length === 0 ? (
@@ -537,12 +498,10 @@ const ChatApp = () => {
                         : "hover:bg-slate-800/30" // ✅ align left
                     }`}
                   >
-                    {/* Avatar */}
                     <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white">
                       👤
                     </div>
 
-                    {/* Message box */}
                     <div className="flex-1">
                       <div
                         className={`flex items-center gap-2 mb-1 ${
@@ -570,7 +529,8 @@ const ChatApp = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="p-4 bg-slate-800/50 border-t border-purple-500/20">
+          {/* 🔹 Sticky Input Box */}
+          <div className="sticky bottom-0 bg-slate-800 border-t border-purple-500/20 p-4">
             <div className="flex items-center gap-3 bg-slate-700/50 rounded-xl p-3 border border-purple-500/20">
               <Plus className="w-6 h-6 text-gray-400" />
               <input
@@ -602,6 +562,7 @@ const ChatApp = () => {
                 <Send className="w-5 h-5 text-white" />
               </button>
             </div>
+
             {!isConnected && (
               <p className="text-yellow-400 text-xs mt-2 text-center">
                 You're offline. Messages will be sent when connection is
@@ -612,42 +573,65 @@ const ChatApp = () => {
         </div>
 
         {/* Right Sidebar: Groups */}
-        <div className="hidden md:block w-64 bg-slate-800/80 backdrop-blur-xl border-l border-purple-500/20">
-          <div className="p-4 border-b border-gray-700/50">
-            <h3 className="text-white font-semibold flex items-center gap-2">
-              <Hash className="w-5 h-5 text-purple-400" /> Chat Groups
-            </h3>
-          </div>
-          <div className="p-2 space-y-1 overflow-y-auto">
-            {groups.length === 0 ? (
-              <p className="text-gray-400 text-center mt-4">
-                No groups available
-              </p>
-            ) : (
-              groups.map((group, i) => (
-                <div
-                  key={i}
-                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
-                    group.active
-                      ? "bg-purple-600/50 text-white"
-                      : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
-                  }`}
-                  onClick={() => handleGroupClick(i)}
+        {/* 📌 Mobile Drawer (Slide-in from Right) */}
+        {showGroups && (
+          <div className="fixed inset-0 z-40 bg-black/60 md:hidden">
+            {/* Drawer Panel */}
+            <div
+              className="absolute right-0 top-0 h-full w-64 bg-slate-800/95 backdrop-blur-xl border-l border-purple-500/20 shadow-lg transform transition-transform duration-300 ease-in-out"
+              style={{
+                transform: showGroups ? "translateX(0)" : "translateX(100%)",
+              }}
+            >
+              {/* Header */}
+              <div className="p-4 border-b border-gray-700/50 flex items-center justify-between">
+                <h3 className="text-white font-semibold flex items-center gap-2">
+                  <Hash className="w-5 h-5 text-purple-400" /> Chat Groups
+                </h3>
+                <button
+                  className="p-2 rounded-lg hover:bg-slate-700/50"
+                  onClick={() => setShowGroups(false)}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg">{group.icon}</span>
-                    <span className="font-medium">{group.name}</span>
-                  </div>
-                  {group.unread > 0 && (
-                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                      {group.unread}
-                    </span>
-                  )}
-                </div>
-              ))
-            )}
+                  ✕
+                </button>
+              </div>
+
+              {/* Groups List */}
+              <div className="p-2 space-y-1 overflow-y-auto">
+                {groups.length === 0 ? (
+                  <p className="text-gray-400 text-center mt-4">
+                    No groups available
+                  </p>
+                ) : (
+                  groups.map((group, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
+                        group.active
+                          ? "bg-purple-600/50 text-white"
+                          : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
+                      }`}
+                      onClick={() => {
+                        handleGroupClick(i);
+                        setShowGroups(false);
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">{group.icon}</span>
+                        <span className="font-medium">{group.name}</span>
+                      </div>
+                      {group.unread > 0 && (
+                        <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                          {group.unread}
+                        </span>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
