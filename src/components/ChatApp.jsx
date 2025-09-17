@@ -573,65 +573,109 @@ const ChatApp = () => {
         </div>
 
         {/* Right Sidebar: Groups */}
-        {/* 📌 Mobile Drawer (Slide-in from Right) */}
-        {showGroups && (
-          <div className="fixed inset-0 z-40 bg-black/60 md:hidden">
-            {/* Drawer Panel */}
-            <div
-              className="absolute right-0 top-0 h-full w-64 bg-slate-800/95 backdrop-blur-xl border-l border-purple-500/20 shadow-lg transform transition-transform duration-300 ease-in-out"
-              style={{
-                transform: showGroups ? "translateX(0)" : "translateX(100%)",
-              }}
-            >
-              {/* Header */}
-              <div className="p-4 border-b border-gray-700/50 flex items-center justify-between">
-                <h3 className="text-white font-semibold flex items-center gap-2">
-                  <Hash className="w-5 h-5 text-purple-400" /> Chat Groups
-                </h3>
-                <button
-                  className="p-2 rounded-lg hover:bg-slate-700/50"
-                  onClick={() => setShowGroups(false)}
+        {/* ✅ Desktop Sidebar (Always visible on the right) */}
+        <div className="hidden md:block w-64 bg-slate-800/80 backdrop-blur-xl border-l border-purple-500/20">
+          <div className="p-4 border-b border-gray-700/50">
+            <h3 className="text-white font-semibold flex items-center gap-2">
+              <Hash className="w-5 h-5 text-purple-400" /> Chat Groups
+            </h3>
+          </div>
+          <div className="p-2 space-y-1 overflow-y-auto">
+            {groups.length === 0 ? (
+              <p className="text-gray-400 text-center mt-4">
+                No groups available
+              </p>
+            ) : (
+              groups.map((group, i) => (
+                <div
+                  key={i}
+                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
+                    group.active
+                      ? "bg-purple-600/50 text-white"
+                      : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
+                  }`}
+                  onClick={() => handleGroupClick(i)}
                 >
-                  ✕
-                </button>
-              </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{group.icon}</span>
+                    <span className="font-medium">{group.name}</span>
+                  </div>
+                  {group.unread > 0 && (
+                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      {group.unread}
+                    </span>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
 
-              {/* Groups List */}
-              <div className="p-2 space-y-1 overflow-y-auto">
-                {groups.length === 0 ? (
-                  <p className="text-gray-400 text-center mt-4">
-                    No groups available
-                  </p>
-                ) : (
-                  groups.map((group, i) => (
-                    <div
-                      key={i}
-                      className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
-                        group.active
-                          ? "bg-purple-600/50 text-white"
-                          : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
-                      }`}
-                      onClick={() => {
-                        handleGroupClick(i);
-                        setShowGroups(false);
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">{group.icon}</span>
-                        <span className="font-medium">{group.name}</span>
-                      </div>
-                      {group.unread > 0 && (
-                        <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                          {group.unread}
-                        </span>
-                      )}
+        {/* ✅ Mobile Drawer (Slide-in from Right with Smooth Animation) */}
+        <div
+          className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 ${
+            showGroups ? "opacity-100 visible" : "opacity-0 invisible"
+          }`}
+        >
+          {/* Overlay */}
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setShowGroups(false)}
+          ></div>
+
+          {/* Drawer Panel */}
+          <div
+            className={`absolute right-0 top-0 h-full w-64 bg-slate-800/95 backdrop-blur-xl border-l border-purple-500/20 shadow-lg transform transition-transform duration-300 ease-in-out
+    ${showGroups ? "translate-x-0" : "translate-x-full"}`}
+          >
+            {/* Header */}
+            <div className="p-4 border-b border-gray-700/50 flex items-center justify-between">
+              <h3 className="text-white font-semibold flex items-center gap-2">
+                <Hash className="w-5 h-5 text-purple-400" /> Chat Groups
+              </h3>
+              <button
+                className="p-2 rounded-lg hover:bg-slate-700/50"
+                onClick={() => setShowGroups(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Groups List */}
+            <div className="p-2 space-y-1 overflow-y-auto">
+              {groups.length === 0 ? (
+                <p className="text-gray-400 text-center mt-4">
+                  No groups available
+                </p>
+              ) : (
+                groups.map((group, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
+                      group.active
+                        ? "bg-purple-600/50 text-white"
+                        : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
+                    }`}
+                    onClick={() => {
+                      handleGroupClick(i);
+                      setShowGroups(false);
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">{group.icon}</span>
+                      <span className="font-medium">{group.name}</span>
                     </div>
-                  ))
-                )}
-              </div>
+                    {group.unread > 0 && (
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                        {group.unread}
+                      </span>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
