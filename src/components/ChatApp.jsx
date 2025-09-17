@@ -1,37 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import io from "socket.io-client";
 import axios from "axios";
 import { Send, Users, Hash, Plus, Menu, Wifi, WifiOff } from "lucide-react";
 import { link } from "./link";
-
-
-// ✅ Connect to backend socket
-const sendMessageToServer = async (message, groupID) => {
-  try {
-    const response = await fetch(`${link}/user/chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userID,
-        groupID: groupID || activeGroup.id,
-        message: message,
-      }),
-    });
-
-    if (response.ok) {
-      console.log("✅message successfully");
-      return true;
-    } else {
-      console.error("❌ Send chat failed: HTTP", response.status);
-      return false;
-    }
-  } catch (err) {
-    console.error("❌ Send chat failed:", err);
-    return false;
-  }
-};
 
 // Import socket.io-client from CDN
 const script = document.createElement("script");
@@ -53,7 +23,7 @@ script.onload = () => {
     });
 
     socket.on("connect_error", (err) => {
-      console.error("⚠️ Socket connection error:", err);
+      console.error("⚠ Socket connection error:", err);
     });
   }
 };
@@ -62,7 +32,6 @@ document.head.appendChild(script);
 
 // Global socket reference
 let socket = null;
-
 
 const ChatApp = () => {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -122,7 +91,7 @@ const ChatApp = () => {
     const tempUserId = `user_${Date.now()}_${Math.random()
       .toString(36)
       .substr(2, 9)}`;
-    setUserID(tempUserId);
+    setUserID(localStorage.getItem("userId"));
     console.log("🆔 Generated User ID:", tempUserId);
   }, []);
 
@@ -236,7 +205,7 @@ const ChatApp = () => {
 
   const fetchChats = async (groupId) => {
     try {
-      console.log("📥 Fetching chats from API for group: ${groupId}");
+      console.log(`📥 Fetching chats from API for group: ${groupId}`);
       const response = await fetch(
         `${link}/user/chat?groupID=${groupId}`
       );
@@ -275,6 +244,7 @@ const ChatApp = () => {
     fetchGroups();
   }, []);
 
+  // Socket listener for receiving messages - using the working pattern
   useEffect(() => {
     if (!activeGroup || !socket) return;
 
@@ -294,14 +264,15 @@ const ChatApp = () => {
     };
   }, [activeGroup]);
 
+  // Fixed sendMessageToServer function using the working pattern
   const sendMessageToServer = async (message, groupID) => {
     try {
-      await axios.post(`${link}user/chat`, {
+      await axios.post("https://chatbackendd-3.onrender.com/user/chat", {
         userID,
         groupID: groupID || activeGroup.id,
         message: message,
       });
-      console.log("message success.");
+      console.log("✅ Message successfully");
       return true;
     } catch (err) {
       console.error("❌ Send chat failed:", err);
@@ -385,7 +356,7 @@ const ChatApp = () => {
     setGroups((prev) => prev.map((g, i) => ({ ...g, active: i === index })));
     setActiveGroup(selectedGroup);
 
-    console.log("📥 Fetching messages for group: ${selectedGroup.name}");
+    console.log(`📥 Fetching messages for group: ${selectedGroup.name}`);
     await fetchChats(selectedGroup.id);
   };
 
