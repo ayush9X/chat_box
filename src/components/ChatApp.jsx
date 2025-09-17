@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import axios from "axios";
 import { Send, Users, Hash, Plus, Menu } from "lucide-react";
 
 // ✅ Connect to backend socket
-const socket = io("https://chatbackendd-3.onrender.com");
+const socket = io("https://chatbackendd-3.onrender.com", {
+  transports: ["websocket", "polling"], // Ensure both transports are available
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
+});
 
 const ChatApp = () => {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -12,7 +17,9 @@ const ChatApp = () => {
   const [userID, setUserID] = useState(null);
   const [showGroups, setShowGroups] = useState(false);
   const [groups, setGroups] = useState([]);
-  const [activeGroup, setActiveGroup] = useState(null); // ✅ track active group
+  const [activeGroup, setActiveGroup] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const messagesEndRef = useRef(null);
 
   const [users] = useState([
     {
@@ -48,13 +55,54 @@ const ChatApp = () => {
     },
   ]);
 
-  // ✅ Load userId from localStorage
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
-    if (storedUserId) setUserID(storedUserId);
+    if (storedUserId) {
+      setUserID(storedUserId);
+    } else {
+      const tempUserId = `user_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
+      localStorage.setItem("userId", tempUserId);
+      setUserID(tempUserId);
+    }
   }, []);
 
-  // ✅ Fetch groups from API
+  useEffect(() => {
+    const handleConnect = () => {
+      console.log("🔌 Socket connected:", socket.id);
+      setIsConnected(true);
+    };
+
+    const handleDisconnect = () => {
+      console.log("🔌 Socket disconnected");
+      setIsConnected(false);
+    };
+
+    const handleConnectError = (error) => {
+      console.error("🔌 Socket connection error:", error);
+      setIsConnected(false);
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    socket.on("connect_error", handleConnectError);
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("connect_error", handleConnectError);
+    };
+  }, []);
+
   const fetchGroups = async () => {
     try {
       const res = await axios.get(
@@ -76,29 +124,32 @@ const ChatApp = () => {
 
       setGroups(formattedGroups);
 
-      if (formattedGroups.length > 0) {
+      if (formattedGroups.length > 0 && !activeGroup) {
         const firstGroup = formattedGroups[0];
         setActiveGroup(firstGroup);
-        setGroups((prev) =>
-          prev.map((g, i) => ({ ...g, active: i === 0 }))
-        );
-        await fetchChats(firstGroup.id); // ✅ fetch chats for first group
+        setGroups((prev) => prev.map((g, i) => ({ ...g, active: i === 0 })));
+        await fetchChats(firstGroup.id);
       }
     } catch (err) {
       console.error("Error fetching groups:", err);
     }
   };
 
-  // ✅ Fetch chats for a group
   const fetchChats = async (groupId) => {
     try {
+      console.log(`📥 Fetching chats from API for group: ${groupId}`);
       const res = await axios.get(
         `https://chatbackendd-3.onrender.com/user/chat?groupID=${groupId}`
       );
       if (res.data && Array.isArray(res.data.chats)) {
-        setMessages(res.data.chats);
+        const sortedChats = [...res.data.chats].sort(
+          (a, b) => new Date(a.chat_at) - new Date(b.chat_at) // oldest → latest
+        );
+        setMessages(sortedChats);
+        console.log(`✅ Loaded ${sortedChats.length} messages from API`);
       } else {
         setMessages([]);
+        console.log("📝 No messages found for this group");
       }
     } catch (err) {
       console.error("❌ Error fetching chats:", err);
@@ -110,32 +161,38 @@ const ChatApp = () => {
     fetchGroups();
   }, []);
 
-  // ✅ Listen for new messages
   useEffect(() => {
-    socket.on("receive_message", (msg) => {
-      if (activeGroup && msg.groupID === activeGroup.id) {
-        setMessages((prev) => [...prev, msg]);
-      }
-    });
-    return () => socket.off("receive_message");
+    if (!activeGroup) return;
+
+    const room = `group_${activeGroup.id}`;
+    console.log(`🏠 Joining room: ${room}`);
+    socket.emit("join", { room });
+
+    const handleMessage = (msg) => {
+      console.log("📨 Real-time message received:", msg);
+      setMessages((prev) => [...prev, msg]);
+    };
+
+    socket.on("receive_message", handleMessage);
+
+    return () => {
+      socket.off("receive_message", handleMessage);
+    };
   }, [activeGroup]);
 
-  // ✅ Send message to active group
   const sendMessage = async () => {
     if (!currentMessage.trim() || !userID || !activeGroup) return;
+
     try {
-      const res = await axios.post(
-        "https://chatbackendd-3.onrender.com/user/chat",
-        {
-          userID,
-          message: currentMessage,
-          receiverID: activeGroup.id,
-          groupID: activeGroup.id,
-        }
-      );
-      if (res.data.status === "success") setCurrentMessage("");
+      await axios.post("https://chatbackendd-3.onrender.com/user/chat", {
+        userID,
+        groupID: activeGroup.id,
+        message: currentMessage,
+      });
+      setCurrentMessage("");
+      console.log("✅ Message sent successfully");
     } catch (err) {
-      console.error("❌ Error sending chat:", err);
+      console.error("❌ Send chat failed:", err);
     }
   };
 
@@ -159,17 +216,28 @@ const ChatApp = () => {
     }
   };
 
-  // ✅ Set active group on click
   const handleGroupClick = async (index) => {
     const selectedGroup = groups[index];
     setGroups((prev) => prev.map((g, i) => ({ ...g, active: i === index })));
     setActiveGroup(selectedGroup);
-    await fetchChats(selectedGroup.id); // ✅ load chats for clicked group
+
+    console.log(`📥 Fetching messages for group: ${selectedGroup.name}`);
+    await fetchChats(selectedGroup.id);
+  };
+
+  const formatTime = (timestamp) => {
+    try {
+      return new Date(timestamp).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "";
+    }
   };
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* --- Banner --- */}
       <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 py-10 px-6 text-white relative">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
@@ -184,14 +252,29 @@ const ChatApp = () => {
               </p>
             </div>
           </div>
-          <button className="bg-white text-purple-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-all shadow-xl text-lg">
-            Upgrade Now
-          </button>
+          <div className="flex items-center gap-3">
+            <div
+              className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
+                isConnected
+                  ? "bg-green-500/20 text-green-300"
+                  : "bg-red-500/20 text-red-300"
+              }`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  isConnected ? "bg-green-400" : "bg-red-400"
+                }`}
+              ></div>
+              {isConnected ? "Connected" : "Disconnected"}
+            </div>
+            <button className="bg-white text-purple-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-all shadow-xl text-lg">
+              Upgrade Now
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
-        {/* --- Left Sidebar: Users --- */}
         <div className="hidden md:block w-64 bg-slate-800/80 backdrop-blur-xl border-r border-purple-500/20">
           <div className="p-4 border-b border-gray-700/50">
             <h3 className="text-white font-semibold flex items-center gap-2">
@@ -224,9 +307,7 @@ const ChatApp = () => {
           </div>
         </div>
 
-        {/* --- Chat Main --- */}
         <div className="flex-1 flex flex-col bg-slate-900/50">
-          {/* Header */}
           <div className="p-4 bg-slate-800/50 backdrop-blur-xl border-b border-purple-500/20 flex items-center justify-between">
             <div className="flex items-center gap-2 md:gap-3">
               <Hash className="w-6 h-6 text-purple-400" />
@@ -245,15 +326,16 @@ const ChatApp = () => {
             </button>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
             {messages.length === 0 ? (
-              <p className="text-gray-400 text-center">No messages yet</p>
+              <p className="text-gray-400 text-center">
+                No messages yet. Start the conversation! 💬
+              </p>
             ) : (
               messages.map((msg, idx) => (
                 <div
-                  key={idx}
-                  className={`flex items-start gap-3 p-3 rounded-lg max-w-[80%] ${
+                  key={`${msg.sender}-${msg.chat_at}-${idx}`}
+                  className={`flex items-start gap-3 p-3 rounded-lg max-w-[80%] transition-all duration-200 ${
                     msg.sender === userID
                       ? "bg-purple-800/40 ml-auto"
                       : "hover:bg-slate-800/30"
@@ -268,17 +350,17 @@ const ChatApp = () => {
                         {msg.sender === userID ? "You" : msg.sender}
                       </span>
                       <span className="text-xs text-gray-400">
-                        {msg.chat_at}
+                        {formatTime(msg.chat_at)}
                       </span>
                     </div>
-                    <p className="text-gray-200">{msg.chat}</p>
+                    <p className="text-gray-200 break-words">{msg.chat}</p>
                   </div>
                 </div>
               ))
             )}
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
           <div className="p-4 bg-slate-800/50 border-t border-purple-500/20">
             <div className="flex items-center gap-3 bg-slate-700/50 rounded-xl p-3 border border-purple-500/20">
               <Plus className="w-6 h-6 text-gray-400" />
@@ -287,12 +369,16 @@ const ChatApp = () => {
                 value={currentMessage}
                 onChange={(e) => setCurrentMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
-                className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none"
+                placeholder={
+                  isConnected ? "Type your message..." : "Connecting..."
+                }
+                disabled={!isConnected}
+                className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none disabled:opacity-50"
               />
               <button
                 onClick={sendMessage}
-                className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg hover:from-purple-600 hover:to-pink-600"
+                disabled={!isConnected || !currentMessage.trim()}
+                className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 <Send className="w-5 h-5 text-white" />
               </button>
@@ -316,7 +402,7 @@ const ChatApp = () => {
               groups.map((group, i) => (
                 <div
                   key={i}
-                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer ${
+                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
                     group.active
                       ? "bg-purple-600/50 text-white"
                       : "hover:bg-slate-700/50 text-gray-300 hover:text-white"

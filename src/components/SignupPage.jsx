@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Import navigate
+import { useNavigate, Link } from "react-router-dom"; // ✅ Added Link
 import axios from "axios";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
@@ -16,7 +16,7 @@ const SignupPage = () => {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
 
-  const navigate = useNavigate(); // ✅ Initialize navigate
+  const navigate = useNavigate();
 
   // Handle input change
   const handleChange = (e) => {
@@ -42,7 +42,6 @@ const SignupPage = () => {
   };
 
   // Submit form
-  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
@@ -62,14 +61,12 @@ const SignupPage = () => {
         }
       );
 
-      // ✅ Save token & user ID in localStorage
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.user.id);
 
       setMessage("✅ Signup successful! Redirecting...");
       console.log("API Response:", res.data);
 
-      // ✅ Redirect to dashboard after success
       setTimeout(() => {
         navigate("/chat");
       }, 1500);
@@ -183,6 +180,14 @@ const SignupPage = () => {
           <FaApple className="text-xl" /> Apple
         </button>
       </div>
+
+      {/* Login Option */}
+      <p className="mt-6 text-gray-700 text-sm">
+        Already have an account?{" "}
+        <Link to="/login" className="text-purple-800 hover:underline">
+          Log in
+        </Link>
+      </p>
     </div>
   );
 };
