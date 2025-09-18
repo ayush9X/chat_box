@@ -1,38 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Send, Users, Hash, Plus, Menu, Wifi, WifiOff } from "lucide-react";
-import { link } from "./link";
 
-// Import socket.io-client from CDN
-const script = document.createElement("script");
-script.src =
-  "https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js";
-script.async = true;
-
-script.onload = () => {
-  if (window.io) {
-    socket = window.io("https://chatbackendd-3.onrender.com", {
-      transports: ["websocket", "polling"],
-      reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 2000,
-      timeout: 20000,
-    });
-
-    socket.on("connect", () => {
-      console.log("🔌 Connected to server via Socket.IO");
-    });
-
-    socket.on("connect_error", (err) => {
-      console.error("⚠ Socket connection error:", err);
-    });
-  }
-};
-
-document.head.appendChild(script);
-
-// Global socket reference
-let socket = null;
+// Mock link for demonstration
+const link = "https://chatbackendd-3.onrender.com";
 
 const ChatApp = () => {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -44,7 +14,9 @@ const ChatApp = () => {
   const [activeGroup, setActiveGroup] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [pendingMessages, setPendingMessages] = useState([]);
+  const [socket, setSocket] = useState(null);
   const messagesEndRef = useRef(null);
+  const socketRef = useRef(null);
 
   const [users] = useState([
     {
@@ -80,14 +52,15 @@ const ChatApp = () => {
     },
   ]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
+  // Initialize user
   useEffect(() => {
     const tempUserId = `user_${Date.now()}_${Math.random()
       .toString(36)
@@ -97,69 +70,85 @@ const ChatApp = () => {
     console.log("🆔 Generated User ID:", tempUserId);
   }, []);
 
+  // Initialize Socket.IO
   useEffect(() => {
-    const setupSocketListeners = () => {
-      if (!socket) return;
+    const initializeSocket = async () => {
+      try {
+        // Load Socket.IO dynamically
+        if (!window.io) {
+          const script = document.createElement("script");
+          script.src =
+            "https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js";
+          script.async = true;
 
-      const handleConnect = () => {
-        console.log("🔌 Socket connected:", socket.id);
-        setIsConnected(true);
-
-        if (pendingMessages.length > 0) {
-          console.log("📤 Sending pending messages:", pendingMessages.length);
-          pendingMessages.forEach((msg) => {
-            sendMessageToServer(msg.message, msg.groupID);
+          await new Promise((resolve, reject) => {
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
           });
-          setPendingMessages([]);
         }
-      };
 
-      const handleDisconnect = (reason) => {
-        console.log("🔌 Socket disconnected:", reason);
-        setIsConnected(false);
-      };
+        if (window.io && !socketRef.current) {
+          const newSocket = window.io(link, {
+            transports: ["websocket", "polling"],
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 2000,
+            timeout: 20000,
+          });
 
-      const handleConnectError = (error) => {
-        console.error("🔌 Socket connection error:", error);
-        setIsConnected(false);
-      };
+          socketRef.current = newSocket;
+          setSocket(newSocket);
 
-      const handleReconnect = (attemptNumber) => {
-        console.log("🔄 Socket reconnected after", attemptNumber, "attempts");
-        setIsConnected(true);
-      };
+          newSocket.on("connect", () => {
+            console.log("🔌 Connected to server via Socket.IO");
+            setIsConnected(true);
+          });
 
-      const handleReconnectAttempt = (attemptNumber) => {
-        console.log("🔄 Attempting to reconnect...", attemptNumber);
-      };
+          newSocket.on("disconnect", (reason) => {
+            console.log("🔌 Socket disconnected:", reason);
+            setIsConnected(false);
+          });
 
-      socket.on("connect", handleConnect);
-      socket.on("disconnect", handleDisconnect);
-      socket.on("connect_error", handleConnectError);
-      socket.on("reconnect", handleReconnect);
-      socket.on("reconnect_attempt", handleReconnectAttempt);
+          newSocket.on("connect_error", (error) => {
+            console.error("🔌 Socket connection error:", error);
+            setIsConnected(false);
+          });
 
-      setIsConnected(socket.connected);
-
-      return () => {
-        socket.off("connect", handleConnect);
-        socket.off("disconnect", handleDisconnect);
-        socket.off("connect_error", handleConnectError);
-        socket.off("reconnect", handleReconnect);
-        socket.off("reconnect_attempt", handleReconnectAttempt);
-      };
-    };
-
-    const checkSocket = () => {
-      if (socket) {
-        return setupSocketListeners();
-      } else {
-        setTimeout(checkSocket, 500);
+          newSocket.on("reconnect", (attemptNumber) => {
+            console.log(
+              "🔄 Socket reconnected after",
+              attemptNumber,
+              "attempts"
+            );
+            setIsConnected(true);
+          });
+        }
+      } catch (error) {
+        console.error("Failed to load Socket.IO:", error);
       }
     };
 
-    checkSocket();
-  }, [pendingMessages]);
+    initializeSocket();
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
+  }, []);
+
+  // Handle pending messages when connected
+  useEffect(() => {
+    if (isConnected && pendingMessages.length > 0 && socket) {
+      console.log("📤 Sending pending messages:", pendingMessages.length);
+      pendingMessages.forEach((msg) => {
+        sendMessageToServer(msg.message, msg.groupID);
+      });
+      setPendingMessages([]);
+    }
+  }, [isConnected, pendingMessages, socket]);
 
   const fetchGroups = async () => {
     try {
@@ -247,14 +236,23 @@ const ChatApp = () => {
 
     const handleMessage = (msg) => {
       console.log("📨 Real-time message received:", msg);
-      console.log(typeof msg.sender, msg.sender);
 
-      if (String(msg.sender) == String(username)) {
+      // ✅ Normalize keys (backend sends {userID, message}, UI expects {sender, chat})
+      const formattedMsg = {
+        sender: msg.userID || msg.sender,
+        chat: msg.message || msg.chat,
+        chat_at: msg.chat_at || new Date().toISOString(),
+        groupID: msg.groupID,
+        status: "sent",
+      };
+
+      // ✅ Skip my own messages
+      if (String(formattedMsg.sender) === String(userID)) {
         console.log("⏩ Skipping my own echoed message");
         return;
       }
 
-      setMessages((prev) => [...prev, msg]);
+      setMessages((prev) => [...prev, formattedMsg]);
     };
 
     socket.on("receive_message", handleMessage);
@@ -262,19 +260,31 @@ const ChatApp = () => {
     return () => {
       console.log(`🚪 Leaving room: ${room}`);
       socket.off("receive_message", handleMessage);
-      socket.emit("leave", { room }); // optional if backend supports it
+      socket.emit("leave", { room });
     };
   }, [activeGroup, socket, userID]);
 
   const sendMessageToServer = async (message, groupID) => {
     try {
-      await axios.post("https://chatbackendd-3.onrender.com/user/chat", {
-        userID,
-        groupID: groupID || activeGroup.id,
-        message: message,
+      const response = await fetch(`${link}/user/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userID,
+          groupID: groupID || activeGroup.id,
+          message: message,
+        }),
       });
-      console.log("✅ Message successfully");
-      return true;
+
+      if (response.ok) {
+        console.log("✅ Message sent successfully");
+        return true;
+      } else {
+        console.error("Send chat failed:", response.statusText);
+        return false;
+      }
     } catch (err) {
       console.error("Send chat failed:", err);
       return false;
@@ -386,61 +396,66 @@ const ChatApp = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 py-10 px-6 text-white relative hidden lg:block">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+      {/* Fixed Advertisement Banner */}
+      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 py-4 lg:py-6 px-4 lg:px-6 text-white relative flex-shrink-0">
         <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-          <div className="flex items-center space-x-4">
-            <div className="text-5xl">🚀</div>
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-5">
+          <div className="flex items-center space-x-3 lg:space-x-4">
+            <div className="text-2xl lg:text-4xl">🚀</div>
             <div>
-              <h2 className="text-2xl md:text-3xl font-extrabold">
+              <h2 className="text-lg lg:text-xl xl:text-2xl font-extrabold">
                 Premium Chat Experience - 50% OFF!
               </h2>
-              <p className="text-base md:text-lg opacity-90">
+              <p className="text-sm lg:text-base opacity-90">
                 Unlock unlimited features, custom themes, and priority support
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 lg:gap-3">
             <div
-              className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
+              className={`flex items-center gap-2 px-2 lg:px-3 py-1 rounded-full text-xs lg:text-sm ${
                 isConnected
                   ? "bg-green-500/20 text-green-300"
                   : "bg-red-500/20 text-red-300"
               }`}
             >
               {isConnected ? (
-                <Wifi className="w-4 h-4" />
+                <Wifi className="w-3 h-3 lg:w-4 lg:h-4" />
               ) : (
-                <WifiOff className="w-4 h-4" />
+                <WifiOff className="w-3 h-3 lg:w-4 lg:h-4" />
               )}
-              {isConnected ? "Connected" : "Disconnected"}
+              <span className="hidden sm:inline">
+                {isConnected ? "Connected" : "Disconnected"}
+              </span>
               {pendingMessages.length > 0 && (
-                <span className="ml-2 bg-yellow-500 text-yellow-900 px-2 py-0.5 rounded text-xs">
-                  {pendingMessages.length} pending
+                <span className="ml-1 lg:ml-2 bg-yellow-500 text-yellow-900 px-1 lg:px-2 py-0.5 rounded text-xs">
+                  {pendingMessages.length}
                 </span>
               )}
             </div>
-            <button className="bg-white text-purple-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-all shadow-xl text-lg">
+            <button className="bg-white text-purple-600 px-3 lg:px-6 py-1.5 lg:py-2 rounded-full font-bold hover:bg-gray-100 transition-all shadow-lg text-sm lg:text-base">
               Upgrade Now
             </button>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-y-auto flex-col md:flex-row">
-        <div className="hidden md:block w-64 bg-slate-800/80 backdrop-blur-xl border-r border-purple-500/20">
-          <div className="p-4 border-b border-gray-700/50">
+      {/* Main Chat Container */}
+      <div className="flex flex-1 min-h-0">
+        {/* Left Sidebar: Users (Desktop only) */}
+        <div className="hidden md:flex w-64 bg-slate-800/80 backdrop-blur-xl border-r border-purple-500/20 flex-shrink-0 flex-col">
+          <div className="p-4 border-b border-gray-700/50 flex-shrink-0">
             <h3 className="text-white font-semibold flex items-center gap-2">
               <Users className="w-5 h-5 text-purple-400" />
               Online Users ({users.filter((u) => u.status === "online").length})
             </h3>
           </div>
-          <div className="p-2 space-y-1 overflow-y-auto h-full">
+          <div className="flex-1 p-2 space-y-1 overflow-y-auto">
             {users.map((user, i) => (
               <div
                 key={i}
-                className="flex items-center p-3 rounded-lg hover:bg-slate-700/50"
+                className="flex items-center p-3 rounded-lg hover:bg-slate-700/50 transition-colors"
               >
                 <div className="relative">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
@@ -452,75 +467,83 @@ const ChatApp = () => {
                     )}`}
                   ></div>
                 </div>
-                <div className="ml-3">
-                  <p className="text-white font-medium">{user.name}</p>
-                  <p className="text-xs text-gray-400">{user.activity}</p>
+                <div className="ml-3 min-w-0 flex-1">
+                  <p className="text-white font-medium truncate">{user.name}</p>
+                  <p className="text-xs text-gray-400 truncate">
+                    {user.activity}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col bg-slate-900/50">
-          {/* 🔹 Chat Header (Sticky on Mobile & Desktop) */}
-          <div className="sticky top-0 z-30 p-4 bg-slate-800/50 backdrop-blur-xl border-b border-purple-500/20 flex items-center justify-between">
-            <div className="flex items-center gap-2 md:gap-3">
-              <Hash className="w-6 h-6 text-purple-400" />
-              <h2 className="text-lg md:text-xl font-bold text-white">
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col bg-slate-900/50 min-w-0">
+          {/* Chat Header */}
+          <div className="flex-shrink-0 p-3 lg:p-4 bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 flex items-center justify-between">
+            <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+              <Hash className="w-5 h-5 lg:w-6 lg:h-6 text-purple-400 flex-shrink-0" />
+              <h2 className="text-base lg:text-lg xl:text-xl font-bold text-white truncate">
                 {activeGroup?.name || "general"}
               </h2>
-              <span className="hidden md:inline text-gray-400 text-sm">
+              <span className="hidden md:inline text-gray-400 text-sm truncate">
                 Welcome to the main channel!
               </span>
             </div>
             <button
-              className="md:hidden p-2 rounded-lg hover:bg-slate-700/50"
+              className="md:hidden p-2 rounded-lg hover:bg-slate-700/50 transition-colors flex-shrink-0"
               onClick={() => setShowGroups(true)}
             >
-              <Menu className="w-6 h-6 text-gray-300" />
+              <Menu className="w-5 h-5 lg:w-6 lg:h-6 text-gray-300" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
+          {/* Messages Container */}
+          <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-4">
             {messages.length === 0 ? (
-              <p className="text-gray-400 text-center">
-                No messages yet. Start the conversation! 💬
-              </p>
+              <div className="flex items-center justify-center h-full">
+                <p className="text-gray-400 text-center">
+                  No messages yet. Start the conversation! 💬
+                </p>
+              </div>
             ) : (
               messages.map((msg, idx) => {
                 const isMe = msg.sender === userID;
                 return (
                   <div
                     key={`${msg.sender}-${msg.chat_at}-${idx}`}
-                    className={`flex items-start gap-3 p-3 rounded-lg max-w-[80%] transition-all duration-200 ${
+                    className={`flex items-start gap-3 p-3 rounded-lg max-w-[85%] lg:max-w-[80%] transition-all duration-200 ${
                       isMe
-                        ? "bg-purple-800/40 ml-auto flex-row-reverse" // ✅ align right
-                        : "hover:bg-slate-800/30" // ✅ align left
+                        ? "bg-purple-800/40 ml-auto flex-row-reverse"
+                        : "hover:bg-slate-800/30"
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white">
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white flex-shrink-0">
                       👤
                     </div>
 
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div
                         className={`flex items-center gap-2 mb-1 ${
                           isMe ? "justify-end flex-row-reverse" : ""
                         }`}
                       >
-                        <span className="font-semibold text-white">
+                        <span className="font-semibold text-white text-sm lg:text-base truncate">
                           {isMe ? "You" : msg.sender}
                         </span>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-400 flex-shrink-0">
                           {formatTime(msg.chat_at)}
                         </span>
                         {isMe && (
-                          <span className="text-xs">
+                          <span className="text-xs flex-shrink-0">
                             {getMessageStatusIcon(msg)}
                           </span>
                         )}
                       </div>
-                      <p className="text-gray-200 break-words">{msg.chat}</p>
+                      <p className="text-gray-200 break-words text-sm lg:text-base">
+                        {msg.chat}
+                      </p>
                     </div>
                   </div>
                 );
@@ -529,10 +552,10 @@ const ChatApp = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* 🔹 Sticky Input Box */}
-          <div className="sticky bottom-0 bg-slate-800 border-t border-purple-500/20 p-4">
-            <div className="flex items-center gap-3 bg-slate-700/50 rounded-xl p-3 border border-purple-500/20">
-              <Plus className="w-6 h-6 text-gray-400" />
+          {/* Input Box - Fixed at bottom */}
+          <div className="flex-shrink-0 bg-slate-800/90 backdrop-blur-xl border-t border-purple-500/20 p-3 lg:p-4">
+            <div className="flex items-center gap-2 lg:gap-3 bg-slate-700/50 rounded-xl p-2 lg:p-3 border border-purple-500/20">
+              <Plus className="w-5 h-5 lg:w-6 lg:h-6 text-gray-400 flex-shrink-0" />
               <input
                 type="text"
                 value={currentMessage}
@@ -543,12 +566,12 @@ const ChatApp = () => {
                     ? "Type your message..."
                     : "Type your message (will send when connected)..."
                 }
-                className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none"
+                className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none text-sm lg:text-base min-w-0"
               />
               <button
                 onClick={sendMessage}
                 disabled={!currentMessage.trim() || !userID || !activeGroup}
-                className={`p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ${
                   isConnected
                     ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                     : "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
@@ -559,7 +582,7 @@ const ChatApp = () => {
                     : "Queue message for sending when connected"
                 }
               >
-                <Send className="w-5 h-5 text-white" />
+                <Send className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
               </button>
             </div>
 
@@ -572,19 +595,18 @@ const ChatApp = () => {
           </div>
         </div>
 
-        {/* Right Sidebar: Groups */}
-        {/* ✅ Desktop Sidebar (Always visible on the right) */}
-        <div className="hidden md:block w-64 bg-slate-800/80 backdrop-blur-xl border-l border-purple-500/20">
-          <div className="p-4 border-b border-gray-700/50">
+        {/* Right Sidebar: Groups (Desktop) */}
+        <div className="hidden md:flex w-64 bg-slate-800/80 backdrop-blur-xl border-l border-purple-500/20 flex-shrink-0 flex-col">
+          <div className="p-4 border-b border-gray-700/50 flex-shrink-0">
             <h3 className="text-white font-semibold flex items-center gap-2">
               <Hash className="w-5 h-5 text-purple-400" /> Chat Groups
             </h3>
           </div>
-          <div className="p-2 space-y-1 overflow-y-auto">
+          <div className="flex-1 p-2 space-y-1 overflow-y-auto">
             {groups.length === 0 ? (
-              <p className="text-gray-400 text-center mt-4">
-                No groups available
-              </p>
+              <div className="flex items-center justify-center h-full">
+                <p className="text-gray-400 text-center">No groups available</p>
+              </div>
             ) : (
               groups.map((group, i) => (
                 <div
@@ -596,12 +618,12 @@ const ChatApp = () => {
                   }`}
                   onClick={() => handleGroupClick(i)}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg">{group.icon}</span>
-                    <span className="font-medium">{group.name}</span>
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <span className="text-lg flex-shrink-0">{group.icon}</span>
+                    <span className="font-medium truncate">{group.name}</span>
                   </div>
                   {group.unread > 0 && (
-                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full flex-shrink-0">
                       {group.unread}
                     </span>
                   )}
@@ -611,42 +633,41 @@ const ChatApp = () => {
           </div>
         </div>
 
-        {/* ✅ Mobile Drawer (Slide-in from Right with Smooth Animation) */}
+        {/* Mobile Groups Drawer */}
         <div
-          className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 ${
+          className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${
             showGroups ? "opacity-100 visible" : "opacity-0 invisible"
           }`}
         >
-          {/* Overlay */}
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => setShowGroups(false)}
           ></div>
 
-          {/* Drawer Panel */}
           <div
-            className={`absolute right-0 top-0 h-full w-64 bg-slate-800/95 backdrop-blur-xl border-l border-purple-500/20 shadow-lg transform transition-transform duration-300 ease-in-out
-    ${showGroups ? "translate-x-0" : "translate-x-full"}`}
+            className={`absolute right-0 top-0 h-full w-64 bg-slate-800/95 backdrop-blur-xl border-l border-purple-500/20 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col ${
+              showGroups ? "translate-x-0" : "translate-x-full"
+            }`}
           >
-            {/* Header */}
-            <div className="p-4 border-b border-gray-700/50 flex items-center justify-between">
+            <div className="p-4 border-b border-gray-700/50 flex items-center justify-between flex-shrink-0">
               <h3 className="text-white font-semibold flex items-center gap-2">
                 <Hash className="w-5 h-5 text-purple-400" /> Chat Groups
               </h3>
               <button
-                className="p-2 rounded-lg hover:bg-slate-700/50"
+                className="p-2 rounded-lg hover:bg-slate-700/50 text-white text-lg"
                 onClick={() => setShowGroups(false)}
               >
                 ✕
               </button>
             </div>
 
-            {/* Groups List */}
-            <div className="p-2 space-y-1 overflow-y-auto">
+            <div className="flex-1 p-2 space-y-1 overflow-y-auto">
               {groups.length === 0 ? (
-                <p className="text-gray-400 text-center mt-4">
-                  No groups available
-                </p>
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-400 text-center">
+                    No groups available
+                  </p>
+                </div>
               ) : (
                 groups.map((group, i) => (
                   <div
@@ -661,12 +682,14 @@ const ChatApp = () => {
                       setShowGroups(false);
                     }}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">{group.icon}</span>
-                      <span className="font-medium">{group.name}</span>
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <span className="text-lg flex-shrink-0">
+                        {group.icon}
+                      </span>
+                      <span className="font-medium truncate">{group.name}</span>
                     </div>
                     {group.unread > 0 && (
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full flex-shrink-0">
                         {group.unread}
                       </span>
                     )}
