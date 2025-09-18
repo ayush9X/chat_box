@@ -65,7 +65,7 @@ const ChatApp = () => {
     const tempUserId = `user_${Date.now()}_${Math.random()
       .toString(36)
       .substr(2, 9)}`;
-    setUserID(tempUserId);
+    setUserID(localStorage.getItem("userId");
     setUsername(`User_${Math.random().toString(36).substr(2, 5)}`);
     console.log("🆔 Generated User ID:", tempUserId);
   }, []);
