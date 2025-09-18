@@ -239,7 +239,7 @@ const ChatApp = () => {
 
       // ✅ Normalize keys (backend sends {userID, message}, UI expects {sender, chat})
       const formattedMsg = {
-        sender: msg.userID || msg.sender,
+        sender: msg.sender,
         chat: msg.message || msg.chat,
         chat_at: msg.chat_at || new Date().toISOString(),
         groupID: msg.groupID,
