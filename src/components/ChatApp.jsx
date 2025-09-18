@@ -65,8 +65,8 @@ const ChatApp = () => {
     const tempUserId = `user_${Date.now()}_${Math.random()
       .toString(36)
       .substr(2, 9)}`;
-    setUserID(tempUserId);
-    setUsername(`User_${Math.random().toString(36).substr(2, 5)}`);
+    setUserID(localStorage.getItem("userId"));
+    setUsername(localStorage.getItem("username"));
     console.log("🆔 Generated User ID:", tempUserId);
   }, []);
 
@@ -237,7 +237,7 @@ const ChatApp = () => {
     const handleMessage = (msg) => {
       console.log("📨 Real-time message received:", msg);
 
-      if (String(msg.sender) === String(userID)) {
+      if (String(msg.sender) === String(username)) {
         console.log("⏩ Skipping my own echoed message");
         return;
       }
