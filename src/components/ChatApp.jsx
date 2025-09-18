@@ -247,7 +247,7 @@ const ChatApp = () => {
       };
 
       // ✅ Skip my own messages
-      if (String(formattedMsg.sender) === String(userID)) {
+      if (String(formattedMsg.sender) === String(username)) {
         console.log("⏩ Skipping my own echoed message");
         return;
       }
