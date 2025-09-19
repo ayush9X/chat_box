@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Send, Users, Hash, Plus, Menu, Wifi, WifiOff } from "lucide-react";
 
 // Mock link for demonstration
-const link = "https://chatbackendd-3.onrender.com";
+const link = "https://www.joinchat.in";
 
 const ChatApp = () => {
   const [currentMessage, setCurrentMessage] = useState("");
