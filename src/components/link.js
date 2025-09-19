@@ -1,2 +1,2 @@
-export const link = "https://chatbackendd-3.onrender.com"
-export const linked = "https://chatbackendd-3.onrender.com"
+export const link = "https://www.joinchat.in"
+export const linked = "https://www.joinchat.in"

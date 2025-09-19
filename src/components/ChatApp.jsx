@@ -405,7 +405,7 @@ const ChatApp = () => {
             <div className="text-2xl lg:text-4xl">🚀</div>
             <div>
               <h2 className="text-lg lg:text-xl xl:text-2xl font-extrabold">
-                Premium Chat Experience - 50% OFF!
+                Join Chat - 50% OFF!
               </h2>
               <p className="text-sm lg:text-base opacity-90">
                 Unlock unlimited features, custom themes, and priority support
@@ -434,9 +434,15 @@ const ChatApp = () => {
                 </span>
               )}
             </div>
-            <button className="bg-white text-purple-600 px-3 lg:px-6 py-1.5 lg:py-2 rounded-full font-bold hover:bg-gray-100 transition-all shadow-lg text-sm lg:text-base">
-              Upgrade Now
-            </button>
+            <a
+              href="https://t.me/+4aszd823mslmMjBl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <button className="bg-white text-purple-600 px-3 lg:px-6 py-1.5 lg:py-2 rounded-full font-bold hover:bg-gray-100 transition-all shadow-lg text-sm lg:text-base">
+                Join Group
+              </button>
+            </a>
           </div>
         </div>
       </div>
