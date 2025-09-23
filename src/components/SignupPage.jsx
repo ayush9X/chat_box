@@ -6,7 +6,7 @@ import { FaApple } from "react-icons/fa";
 import { link } from "./link";
 
 const GOOGLE_CLIENT_ID =
-  import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
+  import.meta.env.VITE_GOOGLE_CLIENT_ID || "618285673527-b8505poaasjv7g6sused9k746vhuvsu3.apps.googleusercontent.com";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
