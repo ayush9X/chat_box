@@ -62,15 +62,26 @@ const ChatApp = () => {
 
   // Initialize user
   useEffect(() => {
-    const tempUserId = `user_${Date.now()}_${Math.random()
-      .toString(36)
-      .substr(2, 9)}`;
-    setUserID(localStorage.getItem("userId"));
-    setUsername(localStorage.getItem("username"));
-    console.log("🆔 Generated User ID:", tempUserId);
+    const storedUserId = localStorage.getItem("userId") || "7";
+    const storedUsername =
+      localStorage.getItem("username") || `User${storedUserId}`;
+
+    setUserID(storedUserId);
+    setUsername(storedUsername);
+
+    // Store the values if they weren't already stored
+    if (!localStorage.getItem("userId")) {
+      localStorage.setItem("userId", "7");
+    }
+    if (!localStorage.getItem("username")) {
+      localStorage.setItem("username", storedUsername);
+    }
+
+    console.log("🆔 User ID:", storedUserId);
+    console.log("👤 Username:", storedUsername);
   }, []);
 
-  // Initialize Socket.IO
+  // Initialize Socket.IO with better error handling
   useEffect(() => {
     const initializeSocket = async () => {
       try {
@@ -92,9 +103,9 @@ const ChatApp = () => {
           const newSocket = window.io(link, {
             transports: ["websocket", "polling"],
             reconnection: true,
-            reconnectionAttempts: 10,
-            reconnectionDelay: 2000,
-            timeout: 20000,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 3000,
+            timeout: 10000,
           });
 
           socketRef.current = newSocket;
@@ -111,7 +122,7 @@ const ChatApp = () => {
           });
 
           newSocket.on("connect_error", (error) => {
-            console.error("🔌 Socket connection error:", error);
+            console.warn("⚠️ Socket connection error - working in demo mode");
             setIsConnected(false);
           });
 
@@ -123,9 +134,18 @@ const ChatApp = () => {
             );
             setIsConnected(true);
           });
+
+          // Set demo connection after a delay if server is not available
+          setTimeout(() => {
+            if (!newSocket.connected) {
+              console.log("📱 Working in demo mode - server not available");
+              setIsConnected(false);
+            }
+          }, 5000);
         }
       } catch (error) {
-        console.error("Failed to load Socket.IO:", error);
+        console.warn("⚠️ Socket.IO not available - working in demo mode");
+        setIsConnected(false);
       }
     };
 
@@ -152,8 +172,24 @@ const ChatApp = () => {
 
   const fetchGroups = async () => {
     try {
-      const response = await fetch(`${link}/user/group`);
+      console.log(`🔍 Attempting to fetch groups from: ${link}/user/group`);
+      const response = await fetch(`${link}/user/group`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        mode: "cors",
+      });
+
+      console.log(`📡 Server response status: ${response.status}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const data = await response.json();
+      console.log("📊 Groups data received:", data);
 
       const fetchedGroups = Array.isArray(data.groups)
         ? data.groups
@@ -178,22 +214,43 @@ const ChatApp = () => {
         await fetchChats(firstGroup.id);
       }
     } catch (err) {
-      console.error("Error fetching groups:", err);
+      console.error(`❌ Error fetching groups from ${link}:`, err.message);
+      console.warn("⚠️ Server not available, using demo data");
       const demoGroups = [
         { id: "1", name: "General", icon: "#", active: true, unread: 0 },
         { id: "2", name: "Random", icon: "#", active: false, unread: 2 },
         { id: "3", name: "Tech Talk", icon: "#", active: false, unread: 0 },
+        { id: "4", name: "Support", icon: "#", active: false, unread: 1 },
       ];
       setGroups(demoGroups);
       setActiveGroup(demoGroups[0]);
+      // Load demo messages for the first group
+      await fetchChats(demoGroups[0].id);
     }
   };
 
   const fetchChats = async (groupId) => {
     try {
-      console.log(`📥 Fetching chats from API for group: ${groupId}`);
-      const response = await fetch(`${link}/user/chat?groupID=${groupId}`);
+      console.log(
+        `📥 Fetching chats from: ${link}/user/chat?groupID=${groupId}`
+      );
+      const response = await fetch(`${link}/user/chat?groupID=${groupId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        mode: "cors",
+      });
+
+      console.log(`📡 Chat response status: ${response.status}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const data = await response.json();
+      console.log("💬 Chat data received:", data);
 
       if (data && Array.isArray(data.chats)) {
         const sortedChats = [...data.chats].sort(
@@ -206,20 +263,42 @@ const ChatApp = () => {
         console.log("📝 No messages found for this group");
       }
     } catch (err) {
-      console.error("❌ Error fetching chats:", err);
+      console.error(`❌ Error fetching chats from ${link}:`, err.message);
+      console.warn("⚠️ Server not available, loading demo messages");
       const demoMessages = [
         {
-          sender: "user_demo_1",
-          chat: "Welcome to the chat!",
+          sender: "user_1",
+          chat: "Welcome to the chat! 🎉",
           chat_at: new Date(Date.now() - 3600000).toISOString(),
         },
         {
-          sender: "user_demo_2",
-          chat: "Thanks! This looks great.",
+          sender: "user_2",
+          chat: "Thanks! This chat app looks amazing.",
+          chat_at: new Date(Date.now() - 3000000).toISOString(),
+        },
+        {
+          sender: "7",
+          chat: "Hello everyone! Great to be here.",
+          chat_at: new Date(Date.now() - 2400000).toISOString(),
+        },
+        {
+          sender: "user_3",
+          chat: "Has anyone tried the premium features?",
           chat_at: new Date(Date.now() - 1800000).toISOString(),
+        },
+        {
+          sender: "user_1",
+          chat: "Yes! The themes are really nice 👌",
+          chat_at: new Date(Date.now() - 1200000).toISOString(),
+        },
+        {
+          sender: "7",
+          chat: "I'm thinking about upgrading too",
+          chat_at: new Date(Date.now() - 600000).toISOString(),
         },
       ];
       setMessages(demoMessages);
+      console.log("📝 Loaded demo messages for offline mode");
     }
   };
 
@@ -282,12 +361,12 @@ const ChatApp = () => {
         console.log("✅ Message sent successfully");
         return true;
       } else {
-        console.error("Send chat failed:", response.statusText);
-        return false;
+        console.warn("⚠️ Server error, message will work in demo mode");
+        return true; // Return true for demo mode
       }
     } catch (err) {
-      console.error("Send chat failed:", err);
-      return false;
+      console.warn("⚠️ Server not available, message added locally");
+      return true; // Return true for demo mode
     }
   };
 
@@ -397,8 +476,8 @@ const ChatApp = () => {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
-      {/* Fixed Advertisement Banner */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 py-4 lg:py-6 px-4 lg:px-6 text-white relative flex-shrink-0">
+      {/* Fixed Advertisement Banner - Desktop Only */}
+      <div className="hidden md:block bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 py-4 lg:py-6 px-4 lg:px-6 text-white relative flex-shrink-0">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-5">
           <div className="flex items-center space-x-3 lg:space-x-4">
@@ -447,40 +526,132 @@ const ChatApp = () => {
         </div>
       </div>
 
+      {/* Mobile Advertisement Section - Left Sidebar Content Moved to Top */}
+      <div className="md:hidden bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 flex-shrink-0">
+        <div className="p-3 border-b border-gray-700/50">
+          <div className="flex items-center justify-between">
+            <h3 className="text-white font-semibold flex items-center gap-2 text-sm">
+              🚀 Advertisement
+            </h3>
+            <div
+              className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
+                isConnected
+                  ? "bg-green-500/20 text-green-300"
+                  : "bg-red-500/20 text-red-300"
+              }`}
+            >
+              {isConnected ? (
+                <Wifi className="w-3 h-3" />
+              ) : (
+                <WifiOff className="w-3 h-3" />
+              )}
+              <span>{isConnected ? "Online" : "Offline"}</span>
+              {pendingMessages.length > 0 && (
+                <span className="ml-1 bg-yellow-500 text-yellow-900 px-1 py-0.5 rounded text-xs">
+                  {pendingMessages.length}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="p-3 flex gap-3 overflow-x-auto">
+          {/* Horizontal scrolling ads for mobile */}
+          <div className="flex-shrink-0 w-48 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-3 text-white shadow-lg">
+            <div className="text-xl mb-1">🔥</div>
+            <h4 className="font-bold text-sm mb-1">Special Offer</h4>
+            <p className="text-xs opacity-90 mb-2">
+              Get 70% OFF on premium chat themes!
+            </p>
+            <a
+              href="https://t.me/+4aszd823mslmMjBl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                Grab Now
+              </button>
+            </a>
+          </div>
+
+          <div className="flex-shrink-0 w-48 bg-slate-700/50 rounded-lg p-3 text-gray-200 shadow-md">
+            <div className="text-lg mb-1">📢</div>
+            <h4 className="font-bold text-xs mb-1">Sponsored</h4>
+            <p className="text-xs opacity-80 mb-2">
+              Join our Telegram group for exclusive deals and updates.
+            </p>
+            <a
+              href="https://t.me/+4aszd823mslmMjBl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-2 py-1 rounded-full font-semibold text-xs hover:opacity-90 transition-all">
+                Join Now
+              </button>
+            </a>
+          </div>
+
+          <div className="flex-shrink-0 w-48 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg p-3 text-white shadow-lg">
+            <div className="text-xl mb-1">💎</div>
+            <h4 className="font-bold text-sm mb-1">Premium</h4>
+            <p className="text-xs opacity-90 mb-2">
+              Unlock all features and get priority support!
+            </p>
+            <a
+              href="https://t.me/+4aszd823mslmMjBl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <button className="bg-white text-green-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                Upgrade
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Main Chat Container */}
       <div className="flex flex-1 min-h-0">
-        {/* Left Sidebar: Users (Desktop only) */}
+        {/* Left Sidebar: Advertisement (Desktop only) */}
         <div className="hidden md:flex w-64 bg-slate-800/80 backdrop-blur-xl border-r border-purple-500/20 flex-shrink-0 flex-col">
           <div className="p-4 border-b border-gray-700/50 flex-shrink-0">
             <h3 className="text-white font-semibold flex items-center gap-2">
-              <Users className="w-5 h-5 text-purple-400" />
-              Online Users ({users.filter((u) => u.status === "online").length})
+              🚀 Advertisement
             </h3>
           </div>
-          <div className="flex-1 p-2 space-y-1 overflow-y-auto">
-            {users.map((user, i) => (
-              <div
-                key={i}
-                className="flex items-center p-3 rounded-lg hover:bg-slate-700/50 transition-colors"
+          <div className="flex-1 p-4 space-y-4 overflow-y-auto text-center">
+            {/* Example Ad Block */}
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-4 text-white shadow-lg">
+              <h4 className="font-bold text-lg mb-2">🔥 Special Offer</h4>
+              <p className="text-sm opacity-90 mb-3">
+                Get 70% OFF on premium chat themes!
+              </p>
+              <a
+                href="https://t.me/+4aszd823mslmMjBl"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                    {user.avatar}
-                  </div>
-                  <div
-                    className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-slate-800 ${getStatusColor(
-                      user.status
-                    )}`}
-                  ></div>
-                </div>
-                <div className="ml-3 min-w-0 flex-1">
-                  <p className="text-white font-medium truncate">{user.name}</p>
-                  <p className="text-xs text-gray-400 truncate">
-                    {user.activity}
-                  </p>
-                </div>
-              </div>
-            ))}
+                <button className="bg-white text-purple-600 px-3 py-1.5 rounded-full font-bold hover:bg-gray-100 transition-all shadow-md text-sm">
+                  Grab Now
+                </button>
+              </a>
+            </div>
+
+            {/* Another Ad */}
+            <div className="bg-slate-700/50 rounded-xl p-4 text-gray-200 shadow-md">
+              <h4 className="font-bold text-base mb-2">📢 Sponsored</h4>
+              <p className="text-sm opacity-80 mb-3">
+                Join our Telegram group for exclusive deals and updates.
+              </p>
+              <a
+                href="https://t.me/+4aszd823mslmMjBl"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1.5 rounded-full font-semibold hover:opacity-90 transition-all text-sm">
+                  Join Now
+                </button>
+              </a>
+            </div>
           </div>
         </div>
 
