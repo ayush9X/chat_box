@@ -4,9 +4,11 @@ import axios from "axios";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import { link } from "./link";
+import logo from "../assets/logo.png";
 
 const GOOGLE_CLIENT_ID =
-  import.meta.env.VITE_GOOGLE_CLIENT_ID || "618285673527-b8505poaasjv7g6sused9k746vhuvsu3.apps.googleusercontent.com";
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+  "618285673527-b8505poaasjv7g6sused9k746vhuvsu3.apps.googleusercontent.com";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -22,7 +24,6 @@ const SignupPage = () => {
   const [isGoogleDataFilled, setIsGoogleDataFilled] = useState(false);
 
   const navigate = useNavigate();
-
   // Load Google OAuth script
   useEffect(() => {
     const initializeGoogleAuth = () => {
@@ -123,6 +124,11 @@ const SignupPage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+        {/* Logo */}
+        <div className="flex justify-center mb-0">
+          <img src={logo} alt="JoinChat Logo" className="w-28" />
+        </div>
+
         {/* Title */}
         <h1 className="text-2xl font-bold text-gray-900 text-center">
           Create your account
@@ -148,7 +154,6 @@ const SignupPage = () => {
             </div>
           </div>
         )}
-
         {isGoogleDataFilled && (
           <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex justify-between items-center">
             <span>Data loaded from Google</span>

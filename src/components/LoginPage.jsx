@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { link } from "./link";
+import logo from "../assets/logo.png"; // adjust the path if needed
 
 const SlackLogin = () => {
   const [formData, setFormData] = useState({
@@ -51,6 +52,9 @@ const SlackLogin = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+      {/* Logo */}
+      <img src={logo} alt="JoinChat Logo" className="w-32 mb-6" />
+
       {/* Heading */}
       <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
         Sign in to your workspace
