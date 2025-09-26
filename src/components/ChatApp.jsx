@@ -161,14 +161,32 @@ const ChatApp = () => {
 
   // Initialize user
   useEffect(() => {
-    const storedUserId = "7";
-    const storedUsername = `User${storedUserId}`;
+    // Wrap in a flag so it runs only once in Strict Mode
+    let initialized = false;
 
-    setUserID(storedUserId);
-    setUsername(storedUsername);
+    if (!initialized) {
+      let storedUserId = localStorage.getItem("userId");
+      let storedUsername = localStorage.getItem("username");
 
-    console.log("🆔 User ID:", storedUserId);
-    console.log("👤 Username:", storedUsername);
+      if (!storedUserId) {
+        // generate new unique ID
+        storedUserId = Date.now().toString();
+        localStorage.setItem("userId", storedUserId);
+      }
+
+      if (!storedUsername) {
+        storedUsername = `User${storedUserId}`;
+        localStorage.setItem("username", storedUsername);
+      }
+
+      setUserID(storedUserId);
+      setUsername(storedUsername);
+
+      console.log("🆔 User ID:", storedUserId);
+      console.log("👤 Username:", storedUsername);
+
+      initialized = true;
+    }
   }, []);
 
   // Initialize Socket.IO with better error handling
@@ -231,7 +249,7 @@ const ChatApp = () => {
               console.log("📱 Working in demo mode - server not available");
               setIsConnected(false);
             }
-          }, 5000);
+          }, 5000); 
         }
       } catch (error) {
         console.warn("⚠️ Socket.IO not available - working in demo mode");
