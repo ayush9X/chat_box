@@ -15,8 +15,16 @@ const ChatApp = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [pendingMessages, setPendingMessages] = useState([]);
   const [socket, setSocket] = useState(null);
+
+  // Mobile ad sliding states
+  const [showMobileAd, setShowMobileAd] = useState(true);
+  const [scrollDirection, setScrollDirection] = useState("down");
+
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+  const lastScrollTop = useRef(0);
+  const scrollTimeout = useRef(null);
 
   const [users] = useState([
     {
@@ -52,6 +60,54 @@ const ChatApp = () => {
     },
   ]);
 
+  // Handle scroll for mobile ad visibility
+  useEffect(() => {
+    const messagesContainer = messagesContainerRef.current;
+    if (!messagesContainer) return;
+
+    const handleScroll = () => {
+      const currentScrollTop = messagesContainer.scrollTop;
+
+      // Determine scroll direction
+      if (currentScrollTop > lastScrollTop.current && currentScrollTop > 50) {
+        // Scrolling down
+        if (scrollDirection !== "down") {
+          setScrollDirection("down");
+        }
+        setShowMobileAd(false);
+      } else if (currentScrollTop < lastScrollTop.current) {
+        // Scrolling up
+        if (scrollDirection !== "up") {
+          setScrollDirection("up");
+        }
+        setShowMobileAd(false);
+      }
+
+      lastScrollTop.current = currentScrollTop;
+
+      // Clear existing timeout
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+
+      // Set new timeout to show ad after 3 seconds of no scrolling
+      scrollTimeout.current = setTimeout(() => {
+        setShowMobileAd(true);
+      }, 3000);
+    };
+
+    messagesContainer.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    return () => {
+      messagesContainer.removeEventListener("scroll", handleScroll);
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+    };
+  }, [scrollDirection]);
+
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
@@ -62,20 +118,11 @@ const ChatApp = () => {
 
   // Initialize user
   useEffect(() => {
-    const storedUserId = localStorage.getItem("userId") || "7";
-    const storedUsername =
-      localStorage.getItem("username") || `User${storedUserId}`;
+    const storedUserId = "7";
+    const storedUsername = `User${storedUserId}`;
 
     setUserID(storedUserId);
     setUsername(storedUsername);
-
-    // Store the values if they weren't already stored
-    if (!localStorage.getItem("userId")) {
-      localStorage.setItem("userId", "7");
-    }
-    if (!localStorage.getItem("username")) {
-      localStorage.setItem("username", storedUsername);
-    }
 
     console.log("🆔 User ID:", storedUserId);
     console.log("👤 Username:", storedUsername);
@@ -296,6 +343,36 @@ const ChatApp = () => {
           chat: "I'm thinking about upgrading too",
           chat_at: new Date(Date.now() - 600000).toISOString(),
         },
+        {
+          sender: "user_4",
+          chat: "The mobile experience is fantastic!",
+          chat_at: new Date(Date.now() - 300000).toISOString(),
+        },
+        {
+          sender: "7",
+          chat: "Absolutely! The animations are so smooth.",
+          chat_at: new Date(Date.now() - 240000).toISOString(),
+        },
+        {
+          sender: "user_2",
+          chat: "I love how responsive everything feels.",
+          chat_at: new Date(Date.now() - 180000).toISOString(),
+        },
+        {
+          sender: "user_5",
+          chat: "The design is really modern and clean.",
+          chat_at: new Date(Date.now() - 120000).toISOString(),
+        },
+        {
+          sender: "7",
+          chat: "Try scrolling up to see the cool ad animations!",
+          chat_at: new Date(Date.now() - 60000).toISOString(),
+        },
+        {
+          sender: "user_1",
+          chat: "Wow, that's a neat feature! Very polished.",
+          chat_at: new Date(Date.now() - 30000).toISOString(),
+        },
       ];
       setMessages(demoMessages);
       console.log("📝 Loaded demo messages for offline mode");
@@ -475,7 +552,11 @@ const ChatApp = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+    <div
+      className={`h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden transition-all duration-500 ease-in-out ${
+        !showMobileAd ? "md:h-screen" : ""
+      }`}
+    >
       {/* Fixed Advertisement Banner - Desktop Only */}
       <div className="hidden md:block bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 py-4 lg:py-6 px-4 lg:px-6 text-white relative flex-shrink-0">
         <div className="absolute inset-0 bg-black/20"></div>
@@ -526,8 +607,14 @@ const ChatApp = () => {
         </div>
       </div>
 
-      {/* Mobile Advertisement Section - Left Sidebar Content Moved to Top */}
-      <div className="md:hidden bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 flex-shrink-0">
+      {/* Mobile Advertisement Section with Sliding Animation */}
+      <div
+        className={`md:hidden bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 transition-all duration-500 ease-in-out transform ${
+          showMobileAd
+            ? "translate-y-0 opacity-100 flex-shrink-0"
+            : "-translate-y-full opacity-0 absolute top-0 left-0 right-0 z-10"
+        }`}
+      >
         <div className="p-3 border-b border-gray-700/50">
           <div className="flex items-center justify-between">
             <h3 className="text-white font-semibold flex items-center gap-2 text-sm">
@@ -609,8 +696,12 @@ const ChatApp = () => {
         </div>
       </div>
 
-      {/* Main Chat Container */}
-      <div className="flex flex-1 min-h-0">
+      {/* Main Chat Container - Expands when mobile ad is hidden */}
+      <div
+        className={`flex flex-1 min-h-0 transition-all duration-500 ease-in-out ${
+          !showMobileAd ? "md:flex-1" : ""
+        }`}
+      >
         {/* Left Sidebar: Advertisement (Desktop only) */}
         <div className="hidden md:flex w-64 bg-slate-800/80 backdrop-blur-xl border-r border-purple-500/20 flex-shrink-0 flex-col">
           <div className="p-4 border-b border-gray-700/50 flex-shrink-0">
@@ -655,10 +746,18 @@ const ChatApp = () => {
           </div>
         </div>
 
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col bg-slate-900/50 min-w-0">
-          {/* Chat Header */}
-          <div className="flex-shrink-0 p-3 lg:p-4 bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 flex items-center justify-between">
+        {/* Main Chat Area - Expands to full height when mobile ad is hidden */}
+        <div
+          className={`flex-1 flex flex-col bg-slate-900/50 min-w-0 transition-all duration-500 ease-in-out ${
+            !showMobileAd ? "min-h-screen md:min-h-0" : ""
+          }`}
+        >
+          {/* Chat Header - Adjusts position when ad is hidden */}
+          <div
+            className={`flex-shrink-0 p-3 lg:p-4 bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 flex items-center justify-between transition-all duration-500 ease-in-out ${
+              !showMobileAd ? "md:static" : ""
+            }`}
+          >
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
               <Hash className="w-5 h-5 lg:w-6 lg:h-6 text-purple-400 flex-shrink-0" />
               <h2 className="text-base lg:text-lg xl:text-xl font-bold text-white truncate">
@@ -676,8 +775,14 @@ const ChatApp = () => {
             </button>
           </div>
 
-          {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-4">
+          {/* Messages Container with Scroll Detection - Full height when ad hidden */}
+          <div
+            ref={messagesContainerRef}
+            className={`flex-1 overflow-y-auto p-3 lg:p-4 space-y-4 transition-all duration-500 ease-in-out ${
+              !showMobileAd ? "max-h-screen md:max-h-none" : ""
+            }`}
+            style={{ scrollBehavior: "smooth" }}
+          >
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-gray-400 text-center">
