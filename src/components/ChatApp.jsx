@@ -6,11 +6,13 @@ const toggleMobileAd = () => {
   });
 
   if (adPermanentlyHidden && showAdToggle) {
-    // Restore the ad
-    console.log("Restoring ads...");
+    // Restore the ad and reset to original behavior
+    console.log("Restoring ads and resetting scroll behavior...");
     setShowMobileAd(true);
     setAdPermanentlyHidden(false);
     setShowAdToggle(false);
+    // Reset scroll tracking
+    lastScrollTop.current = 0;
   } else if (!adPermanentlyHidden && showMobileAd) {
     // Hide the ad manually
     console.log("Hiding ads manually...");
@@ -47,6 +49,31 @@ const ChatApp = () => {
   const socketRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const lastScrollTop = useRef(0);
+
+  // ✅ Paste toggleMobileAd here
+  const toggleMobileAd = () => {
+    console.log("Toggle button clicked!", {
+      showMobileAd,
+      adPermanentlyHidden,
+      showAdToggle,
+    });
+
+    if (adPermanentlyHidden && showAdToggle) {
+      // Restore the ad and reset to original behavior
+      console.log("Restoring ads and resetting scroll behavior...");
+      setShowMobileAd(true);
+      setAdPermanentlyHidden(false);
+      setShowAdToggle(false);
+      // Reset scroll tracking
+      lastScrollTop.current = 0;
+    } else if (!adPermanentlyHidden && showMobileAd) {
+      // Hide the ad manually
+      console.log("Hiding ads manually...");
+      setShowMobileAd(false);
+      setAdPermanentlyHidden(true);
+      setShowAdToggle(true);
+    }
+  };
 
   const [users] = useState([
     {
@@ -85,27 +112,30 @@ const ChatApp = () => {
   // Handle scroll for mobile ad visibility - Hide permanently on first upward scroll
   useEffect(() => {
     const messagesContainer = messagesContainerRef.current;
-    if (!messagesContainer || adPermanentlyHidden) return;
+    if (!messagesContainer) return;
 
     const handleScroll = () => {
       const currentScrollTop = messagesContainer.scrollTop;
 
-      // Only hide ad on upward scroll, never show it again once hidden
-      if (currentScrollTop < lastScrollTop.current) {
-        // Scrolling up - hide ad permanently
-        if (scrollDirection !== "up") {
-          setScrollDirection("up");
-          setShowMobileAd(false);
-          setAdPermanentlyHidden(true); // Mark as permanently hidden
-          setShowAdToggle(true); // Show the toggle button
-        }
-      } else if (
-        currentScrollTop > lastScrollTop.current &&
-        currentScrollTop > 10
-      ) {
-        // Scrolling down - only update direction, don't show ad
-        if (scrollDirection !== "down") {
-          setScrollDirection("down");
+      // Only process scroll events if ad is not permanently hidden
+      if (!adPermanentlyHidden) {
+        if (currentScrollTop < lastScrollTop.current && currentScrollTop > 0) {
+          // Scrolling up - hide ad permanently
+          if (scrollDirection !== "up") {
+            setScrollDirection("up");
+            setShowMobileAd(false);
+            setAdPermanentlyHidden(true);
+            setShowAdToggle(true);
+            console.log("Ads hidden by scroll up");
+          }
+        } else if (
+          currentScrollTop > lastScrollTop.current &&
+          currentScrollTop > 10
+        ) {
+          // Scrolling down - only update direction, keep ad visible if not permanently hidden
+          if (scrollDirection !== "down") {
+            setScrollDirection("down");
+          }
         }
       }
 
@@ -628,8 +658,8 @@ const ChatApp = () => {
             className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 text-sm font-semibold flex items-center gap-2 border border-white/20"
           >
             <span>📢</span>
-            Show Ads
-            <span className="text-xs opacity-75">👆</span>
+            Restore Ads
+            <span className="text-xs opacity-75">🔄</span>
           </button>
         </div>
       )}
