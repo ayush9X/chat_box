@@ -1,3 +1,24 @@
+const toggleMobileAd = () => {
+  console.log("Toggle button clicked!", {
+    showMobileAd,
+    adPermanentlyHidden,
+    showAdToggle,
+  });
+
+  if (adPermanentlyHidden && showAdToggle) {
+    // Restore the ad
+    console.log("Restoring ads...");
+    setShowMobileAd(true);
+    setAdPermanentlyHidden(false);
+    setShowAdToggle(false);
+  } else if (!adPermanentlyHidden && showMobileAd) {
+    // Hide the ad manually
+    console.log("Hiding ads manually...");
+    setShowMobileAd(false);
+    setAdPermanentlyHidden(true);
+    setShowAdToggle(true);
+  }
+};
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Send, Users, Hash, Plus, Menu, Wifi, WifiOff } from "lucide-react";
 
@@ -19,12 +40,13 @@ const ChatApp = () => {
   // Mobile ad sliding states
   const [showMobileAd, setShowMobileAd] = useState(true);
   const [scrollDirection, setScrollDirection] = useState("down");
+  const [adPermanentlyHidden, setAdPermanentlyHidden] = useState(false);
+  const [showAdToggle, setShowAdToggle] = useState(false);
 
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const lastScrollTop = useRef(0);
-  const scrollTimeout = useRef(null);
 
   const [users] = useState([
     {
@@ -60,40 +82,34 @@ const ChatApp = () => {
     },
   ]);
 
-  // Handle scroll for mobile ad visibility
+  // Handle scroll for mobile ad visibility - Hide permanently on first upward scroll
   useEffect(() => {
     const messagesContainer = messagesContainerRef.current;
-    if (!messagesContainer) return;
+    if (!messagesContainer || adPermanentlyHidden) return;
 
     const handleScroll = () => {
       const currentScrollTop = messagesContainer.scrollTop;
 
-      // Determine scroll direction
-      if (currentScrollTop > lastScrollTop.current && currentScrollTop > 50) {
-        // Scrolling down
+      // Only hide ad on upward scroll, never show it again once hidden
+      if (currentScrollTop < lastScrollTop.current) {
+        // Scrolling up - hide ad permanently
+        if (scrollDirection !== "up") {
+          setScrollDirection("up");
+          setShowMobileAd(false);
+          setAdPermanentlyHidden(true); // Mark as permanently hidden
+          setShowAdToggle(true); // Show the toggle button
+        }
+      } else if (
+        currentScrollTop > lastScrollTop.current &&
+        currentScrollTop > 10
+      ) {
+        // Scrolling down - only update direction, don't show ad
         if (scrollDirection !== "down") {
           setScrollDirection("down");
         }
-        setShowMobileAd(false);
-      } else if (currentScrollTop < lastScrollTop.current) {
-        // Scrolling up
-        if (scrollDirection !== "up") {
-          setScrollDirection("up");
-        }
-        setShowMobileAd(false);
       }
 
       lastScrollTop.current = currentScrollTop;
-
-      // Clear existing timeout
-      if (scrollTimeout.current) {
-        clearTimeout(scrollTimeout.current);
-      }
-
-      // Set new timeout to show ad after 3 seconds of no scrolling
-      scrollTimeout.current = setTimeout(() => {
-        setShowMobileAd(true);
-      }, 3000);
     };
 
     messagesContainer.addEventListener("scroll", handleScroll, {
@@ -102,11 +118,8 @@ const ChatApp = () => {
 
     return () => {
       messagesContainer.removeEventListener("scroll", handleScroll);
-      if (scrollTimeout.current) {
-        clearTimeout(scrollTimeout.current);
-      }
     };
-  }, [scrollDirection]);
+  }, [scrollDirection, adPermanentlyHidden]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -607,12 +620,26 @@ const ChatApp = () => {
         </div>
       </div>
 
-      {/* Mobile Advertisement Section with Sliding Animation */}
+      {/* Mobile Ad Toggle Button - Shows when ad is hidden */}
+      {showAdToggle && adPermanentlyHidden && (
+        <div className="md:hidden fixed top-2 left-1/2 transform -translate-x-1/2 z-50 animate-pulse">
+          <button
+            onClick={toggleMobileAd}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full shadow-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 text-sm font-semibold flex items-center gap-2 border border-white/20"
+          >
+            <span>📢</span>
+            Show Ads
+            <span className="text-xs opacity-75">👆</span>
+          </button>
+        </div>
+      )}
+
+      {/* Mobile Advertisement Section with One-Time Hide Animation */}
       <div
         className={`md:hidden bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 transition-all duration-500 ease-in-out transform ${
-          showMobileAd
-            ? "translate-y-0 opacity-100 flex-shrink-0"
-            : "-translate-y-full opacity-0 absolute top-0 left-0 right-0 z-10"
+          showMobileAd && !adPermanentlyHidden
+            ? "translate-y-0 opacity-100 flex-shrink-0 relative"
+            : "-translate-y-full opacity-0 absolute top-0 left-0 right-0 z-10 pointer-events-none"
         }`}
       >
         <div className="p-3 border-b border-gray-700/50">
@@ -696,10 +723,10 @@ const ChatApp = () => {
         </div>
       </div>
 
-      {/* Main Chat Container - Expands when mobile ad is hidden */}
+      {/* Main Chat Container - Permanently expands when mobile ad is hidden */}
       <div
         className={`flex flex-1 min-h-0 transition-all duration-500 ease-in-out ${
-          !showMobileAd ? "md:flex-1" : ""
+          !showMobileAd || adPermanentlyHidden ? "md:flex-1" : ""
         }`}
       >
         {/* Left Sidebar: Advertisement (Desktop only) */}
@@ -746,10 +773,12 @@ const ChatApp = () => {
           </div>
         </div>
 
-        {/* Main Chat Area - Expands to full height when mobile ad is hidden */}
+        {/* Main Chat Area - Permanently expands to full height when mobile ad is hidden */}
         <div
           className={`flex-1 flex flex-col bg-slate-900/50 min-w-0 transition-all duration-500 ease-in-out ${
-            !showMobileAd ? "min-h-screen md:min-h-0" : ""
+            !showMobileAd || adPermanentlyHidden
+              ? "min-h-screen md:min-h-0"
+              : ""
           }`}
         >
           {/* Chat Header - Adjusts position when ad is hidden */}
@@ -775,11 +804,13 @@ const ChatApp = () => {
             </button>
           </div>
 
-          {/* Messages Container with Scroll Detection - Full height when ad hidden */}
+          {/* Messages Container with Scroll Detection - Permanently full height when ad hidden */}
           <div
             ref={messagesContainerRef}
             className={`flex-1 overflow-y-auto p-3 lg:p-4 space-y-4 transition-all duration-500 ease-in-out ${
-              !showMobileAd ? "max-h-screen md:max-h-none" : ""
+              !showMobileAd || adPermanentlyHidden
+                ? "max-h-screen md:max-h-none"
+                : ""
             }`}
             style={{ scrollBehavior: "smooth" }}
           >
