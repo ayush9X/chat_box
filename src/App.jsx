@@ -7,6 +7,7 @@ import AdminLayout from "./components/Admin";
 import PostsPage from "./components/PostsPage";
 import GroupsPage from "./components/GroupsPage";
 import UsersPage from "./components/UsersPage";
+import ForgotPassword from "./components/ForgotPassword";
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
       <Route path="/" element={<SignupPage />} />
       <Route path="/login" element={<SlackLogin />} />
       <Route path="/chat" element={<ChatApp />} />
+      <Route path="//forgot-password"element={<ForgotPassword />} ></Route>
 
       {/* Admin routes */}
       <Route path="/admin" element={<AdminLayout />}>

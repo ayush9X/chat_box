@@ -50,6 +50,11 @@ const SlackLogin = () => {
     }
   };
 
+  // Handle forgot password navigation
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
       {/* Logo */}
@@ -85,6 +90,17 @@ const SlackLogin = () => {
           className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-4 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
         />
 
+        {/* Forgot Password Link */}
+        <div className="text-right mb-4">
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            className="text-sm text-purple-600 hover:underline bg-none border-none cursor-pointer"
+          >
+            Forgot your password?
+          </button>
+        </div>
+
         <button
           type="submit"
           disabled={loading}
@@ -116,7 +132,7 @@ const SlackLogin = () => {
 
       {/* Signup link */}
       <p className="mt-8 text-sm text-gray-600">
-        New to Slack?{" "}
+        New to joinchat?{" "}
         <a href="/" className="text-purple-600 hover:underline">
           Create an account
         </a>
