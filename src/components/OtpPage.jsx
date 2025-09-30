@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { link } from "./link";
+import { useNavigate } from "react-router-dom";
 
 const OtpPage = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [newPassword, setNewPassword] = useState("");
   const [email, setEmail] = useState("");
   const inputRefs = useRef([]);
+  const navigate = useNavigate()
 
   useEffect(() => {
     // fetch email from localStorage
@@ -15,6 +17,7 @@ const OtpPage = () => {
       setEmail(storedEmail);
     }
   }, []);
+
 
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/[^0-9]/g, ""); // only digits
@@ -55,7 +58,7 @@ const OtpPage = () => {
       );
 
       if (response.data.success) {
-        alert("Password reset successfully!");
+        navigate("/login")
       } else {
         alert(response.data.message || "Failed to reset password");
       }

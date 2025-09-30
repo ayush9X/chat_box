@@ -30,7 +30,6 @@ const SlackLogin = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      // Save token & user info
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.user.id);
       localStorage.setItem("username", res.data.user.username);
