@@ -920,7 +920,7 @@ const ChatApp = () => {
           {/* Input Box - Fixed at bottom */}
           <div className="flex-shrink-0 bg-slate-800/90 backdrop-blur-xl border-t border-purple-500/20 p-3 lg:p-4">
             <div className="flex items-center gap-2 lg:gap-3 bg-slate-700/50 rounded-xl p-2 lg:p-3 border border-purple-500/20">
-              <Plus className="w-5 h-5 lg:w-6 lg:h-6 text-gray-400 flex-shrink-0" />
+              {/* <Plus className="w-5 h-5 lg:w-6 lg:h-6 text-gray-400 flex-shrink-0" /> */}
               <input
                 type="text"
                 value={currentMessage}
