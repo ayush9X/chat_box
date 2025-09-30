@@ -8,7 +8,6 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
   // Handle form submission
@@ -16,24 +15,30 @@ const ForgotPassword = () => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
-    setIsSuccess(false);
 
     try {
-      const res = await axios.post(`${link}/user/forgot-password`, 
+      const res = await axios.post(
+        `${link}/user/forgot-password`,
         { email },
         {
           headers: { "Content-Type": "application/json" },
         }
       );
 
-      setMessage("✅ Password reset link has been sent to your email!");
-      setIsSuccess(true);
       console.log("Forgot Password Response:", res.data);
+
+      if (res.status === 200) {
+        // ✅ Save email in localStorage
+        localStorage.setItem("email", email);
+
+        // ✅ Redirect to OTP page
+        navigate("/reset-password");
+      }
     } catch (err) {
       setMessage(
-        "❌ Error: " + (err.response?.data?.message || err.message || "Something went wrong")
+        "❌ Error: " +
+          (err.response?.data?.message || err.message || "Something went wrong")
       );
-      setIsSuccess(false);
     } finally {
       setLoading(false);
     }
@@ -54,49 +59,33 @@ const ForgotPassword = () => {
         Reset your password
       </h1>
       <p className="text-gray-600 mb-6 text-center max-w-md">
-        Enter your email address and we'll send you a link to reset your password.
+        Enter your email address and we'll send you a link to reset your
+        password.
       </p>
 
       {/* Forgot Password Form */}
-      {!isSuccess ? (
-        <form onSubmit={handleSubmit} className="w-full max-w-md">
-          <input
-            type="email"
-            name="email"
-            placeholder="name@work-email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-4 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
-          />
+      <form onSubmit={handleSubmit} className="w-full max-w-md">
+        <input
+          type="email"
+          name="email"
+          placeholder="name@work-email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full border border-gray-300 rounded-lg px-4 py-3 mb-4 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+        />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-purple-800 text-white font-medium rounded-lg py-3 hover:bg-purple-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-4"
-          >
-            {loading ? "Sending..." : "Send Reset Link"}
-          </button>
-        </form>
-      ) : (
-        <div className="w-full max-w-md">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-            <p className="text-green-700 text-center">
-              Check your email for password reset instructions.
-            </p>
-          </div>
-          
-          <button
-            onClick={handleBackToLogin}
-            className="w-full bg-gray-100 text-gray-700 font-medium rounded-lg py-3 hover:bg-gray-200 transition-colors"
-          >
-            Back to Login
-          </button>
-        </div>
-      )}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-purple-800 text-white font-medium rounded-lg py-3 hover:bg-purple-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+        >
+          {loading ? "Sending..." : "Send OTP"}
+        </button>
+      </form>
 
       {/* Response Message */}
-      {message && !isSuccess && (
+      {message && (
         <div className="mt-4 p-3 rounded-lg max-w-md w-full text-center">
           <p className="text-red-600">{message}</p>
         </div>
@@ -110,17 +99,15 @@ const ForgotPassword = () => {
       )}
 
       {/* Back to Login link */}
-      {!isSuccess && (
-        <p className="mt-8 text-sm text-gray-600">
-          Remember your password?{" "}
-          <button
-            onClick={handleBackToLogin}
-            className="text-purple-600 hover:underline bg-none border-none cursor-pointer"
-          >
-            Back to Sign In
-          </button>
-        </p>
-      )}
+      <p className="mt-8 text-sm text-gray-600">
+        Remember your password?{" "}
+        <button
+          onClick={handleBackToLogin}
+          className="text-purple-600 hover:underline bg-none border-none cursor-pointer"
+        >
+          Back to Sign In
+        </button>
+      </p>
     </div>
   );
 };
