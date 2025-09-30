@@ -23,6 +23,8 @@ const toggleMobileAd = () => {
 };
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Send, Users, Hash, Plus, Menu, Wifi, WifiOff } from "lucide-react";
+import video from "../assets/video.mp4"
+
 
 // Mock link for demonstration
 const link = "https://www.joinchat.in";
@@ -627,7 +629,7 @@ const ChatApp = () => {
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source
-            src="https://www.w3schools.com/html/mov_bbb.mp4"
+            src={video}
             type="video/mp4"
           />
           Your browser does not support the video tag.
