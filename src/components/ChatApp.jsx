@@ -1,7 +1,3 @@
-
-
-
-
 const toggleMobileAd = () => {
   console.log("Toggle button clicked!", {
     showMobileAd,
@@ -253,7 +249,7 @@ const ChatApp = () => {
               console.log("📱 Working in demo mode - server not available");
               setIsConnected(false);
             }
-          }, 5000); 
+          }, 5000);
         }
       } catch (error) {
         console.warn("⚠️ Socket.IO not available - working in demo mode");
@@ -622,10 +618,24 @@ const ChatApp = () => {
         !showMobileAd ? "md:h-screen" : ""
       }`}
     >
-      {/* Fixed Advertisement Banner - Desktop Only */}
-      <div className="hidden md:block bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 py-4 lg:py-6 px-4 lg:px-6 text-white relative flex-shrink-0">
+      <div className="hidden md:block relative flex-shrink-0 text-white">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source
+            src="https://www.w3schools.com/html/mov_bbb.mp4"
+            type="video/mp4"
+          />
+          Your browser does not support the video tag.
+        </video>
+
         <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-5">
+
+        <div className="relative z-10 py-4 lg:py-6 px-4 lg:px-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-5">
           <div className="flex items-center space-x-3 lg:space-x-4">
             <div className="text-2xl lg:text-4xl">🚀</div>
             <div>
@@ -637,6 +647,7 @@ const ChatApp = () => {
               </p>
             </div>
           </div>
+
           <div className="flex items-center gap-2 lg:gap-3">
             <div
               className={`flex items-center gap-2 px-2 lg:px-3 py-1 rounded-full text-xs lg:text-sm ${
@@ -672,7 +683,6 @@ const ChatApp = () => {
         </div>
       </div>
 
-      {/* Mobile Ad Toggle Button - Shows when ad is hidden */}
       {showAdToggle && adPermanentlyHidden && (
         <div className="md:hidden fixed top-2 left-1/2 transform -translate-x-1/2 z-50 animate-pulse">
           <button
@@ -721,25 +731,27 @@ const ChatApp = () => {
           </div>
         </div>
         <div className="p-3 flex gap-3 overflow-x-auto">
-          {/* Horizontal scrolling ads for mobile */}
-          <div className="flex-shrink-0 w-48 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-3 text-white shadow-lg">
-            <div className="text-xl mb-1">🔥</div>
-            <h4 className="font-bold text-sm mb-1">Special Offer</h4>
-            <p className="text-xs opacity-90 mb-2">
-              Get 70% OFF on premium chat themes!
-            </p>
-            <a
-              href="https://t.me/+4aszd823mslmMjBl"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
-                Grab Now
-              </button>
-            </a>
+          <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
+            <img
+              src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
+              alt="Promo"
+              className="w-full h-full object-cover"
+            />
+
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <a
+                href="https://t.me/+4aszd823mslmMjBl"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                  Join Group
+                </button>
+              </a>
+            </div>
           </div>
 
-          <div className="flex-shrink-0 w-48 bg-slate-700/50 rounded-lg p-3 text-gray-200 shadow-md">
+          {/* <div className="flex-shrink-0 w-48 bg-slate-700/50 rounded-lg p-3 text-gray-200 shadow-md">
             <div className="text-lg mb-1">📢</div>
             <h4 className="font-bold text-xs mb-1">Sponsored</h4>
             <p className="text-xs opacity-80 mb-2">
@@ -771,6 +783,46 @@ const ChatApp = () => {
                 Upgrade
               </button>
             </a>
+          </div> */}
+
+          <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
+            <img
+              src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
+              alt="Promo"
+              className="w-full h-full object-cover"
+            />
+
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <a
+                href="https://t.me/+4aszd823mslmMjBl"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                  Join Group
+                </button>
+              </a>
+            </div>
+          </div>
+
+          <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
+            <img
+              src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
+              alt="Promo"
+              className="w-full h-full object-cover"
+            />
+
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <a
+                href="https://t.me/+4aszd823mslmMjBl"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                  Join Group
+                </button>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -790,37 +842,65 @@ const ChatApp = () => {
           </div>
           <div className="flex-1 p-4 space-y-4 overflow-y-auto text-center">
             {/* Example Ad Block */}
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-4 text-white shadow-lg">
-              <h4 className="font-bold text-lg mb-2">🔥 Special Offer</h4>
-              <p className="text-sm opacity-90 mb-3">
-                Get 70% OFF on premium chat themes!
-              </p>
-              <a
-                href="https://t.me/+4aszd823mslmMjBl"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <button className="bg-white text-purple-600 px-3 py-1.5 rounded-full font-bold hover:bg-gray-100 transition-all shadow-md text-sm">
-                  Grab Now
-                </button>
-              </a>
+            <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
+              <img
+                src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
+                alt="Promo"
+                className="w-full h-full object-cover"
+              />
+
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                <a
+                  href="https://t.me/+4aszd823mslmMjBl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                    Join Group
+                  </button>
+                </a>
+              </div>
             </div>
 
             {/* Another Ad */}
-            <div className="bg-slate-700/50 rounded-xl p-4 text-gray-200 shadow-md">
-              <h4 className="font-bold text-base mb-2">📢 Sponsored</h4>
-              <p className="text-sm opacity-80 mb-3">
-                Join our Telegram group for exclusive deals and updates.
-              </p>
-              <a
-                href="https://t.me/+4aszd823mslmMjBl"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1.5 rounded-full font-semibold hover:opacity-90 transition-all text-sm">
-                  Join Now
-                </button>
-              </a>
+            <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
+              <img
+                src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
+                alt="Promo"
+                className="w-full h-full object-cover"
+              />
+
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                <a
+                  href="https://t.me/+4aszd823mslmMjBl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                    Join Group
+                  </button>
+                </a>
+              </div>
+            </div>
+
+            <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
+              <img
+                src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
+                alt="Promo"
+                className="w-full h-full object-cover"
+              />
+
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                <a
+                  href="https://t.me/+4aszd823mslmMjBl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                    Join Group
+                  </button>
+                </a>
+              </div>
             </div>
           </div>
         </div>
