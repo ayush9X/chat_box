@@ -23,8 +23,7 @@ const toggleMobileAd = () => {
 };
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Send, Users, Hash, Plus, Menu, Wifi, WifiOff } from "lucide-react";
-import video from "../assets/video.mp4"
-
+import video from "../assets/video.mp4";
 
 // Mock link for demonstration
 const link = "https://www.joinchat.in";
@@ -628,10 +627,7 @@ const ChatApp = () => {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source
-            src={video}
-            type="video/mp4"
-          />
+          <source src={video} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
 
@@ -734,11 +730,15 @@ const ChatApp = () => {
         </div>
         <div className="p-3 flex gap-3 overflow-x-auto">
           <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
-            <img
-              src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
-              alt="Promo"
+            <video
+              src="/vd1.mp4" // put vd1.mp4 inside public/ folder
               className="w-full h-full object-cover"
-            />
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg" // optional fallback image
+            ></video>
 
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
               <a
@@ -788,11 +788,15 @@ const ChatApp = () => {
           </div> */}
 
           <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
-            <img
-              src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
-              alt="Promo"
+            <video
+              src="/vd2.mp4" // put vd1.mp4 inside public/ folder
               className="w-full h-full object-cover"
-            />
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg" // optional fallback image
+            ></video>
 
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
               <a
@@ -808,11 +812,15 @@ const ChatApp = () => {
           </div>
 
           <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
-            <img
-              src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
-              alt="Promo"
+            <video
+              src="/vd3.mp4" // put vd1.mp4 inside public/ folder
               className="w-full h-full object-cover"
-            />
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg" // optional fallback image
+            ></video>
 
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
               <a
@@ -845,11 +853,15 @@ const ChatApp = () => {
           <div className="flex-1 p-4 space-y-4 overflow-y-auto text-center">
             {/* Example Ad Block */}
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
-              <img
-                src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
-                alt="Promo"
+              <video
+                src="/vd2.mp4" // make sure vd1.mp4 is inside public/ folder
                 className="w-full h-full object-cover"
-              />
+                autoPlay
+                loop
+                muted
+                playsInline
+                poster="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
+              ></video>
 
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                 <a
@@ -866,11 +878,15 @@ const ChatApp = () => {
 
             {/* Another Ad */}
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
-              <img
-                src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
-                alt="Promo"
+              <video
+                src="/vd3.mp4" // make sure vd1.mp4 is inside public/ folder
                 className="w-full h-full object-cover"
-              />
+                autoPlay
+                loop
+                muted
+                playsInline
+                poster="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
+              ></video>
 
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                 <a
@@ -886,11 +902,14 @@ const ChatApp = () => {
             </div>
 
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
-              <img
-                src="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
-                alt="Promo"
+              <video
+                src="/vd1.mp4" // video is in public folder
                 className="w-full h-full object-cover"
-              />
+                autoPlay
+                loop
+                muted
+                playsInline
+              ></video>
 
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                 <a
