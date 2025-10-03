@@ -1159,9 +1159,7 @@ const ChatApp = () => {
                     }}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <span className="text-lg flex-shrink-0">
-                        {group.icon}
-                      </span>
+                      <HouseWifi className="text-lg flex-shrink-0 text-purple-400" />
                       <span className="font-medium truncate">{group.name}</span>
                     </div>
                     {group.unread > 0 && (
