@@ -22,7 +22,16 @@ const toggleMobileAd = () => {
   }
 };
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Send, Users, Hash, Plus, Menu, Wifi, WifiOff, HouseWifi } from "lucide-react";
+import {
+  Send,
+  Users,
+  Hash,
+  Plus,
+  Menu,
+  Wifi,
+  WifiOff,
+  HouseWifi,
+} from "lucide-react";
 
 import video from "../assets/video.mp4";
 
@@ -942,7 +951,7 @@ const ChatApp = () => {
             }`}
           >
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-              <Hash className="w-5 h-5 lg:w-6 lg:h-6 text-purple-400 flex-shrink-0" />
+              <HouseWifi className="w-5 h-5 lg:w-6 lg:h-6 text-purple-400 flex-shrink-0" />
               <h2 className="text-base lg:text-lg xl:text-xl font-bold text-white truncate">
                 {activeGroup?.name || "general"}
               </h2>
@@ -1086,7 +1095,7 @@ const ChatApp = () => {
                   onClick={() => handleGroupClick(i)}
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <span className="text-lg flex-shrink-0">{group.icon}</span>
+                    <HouseWifi className="text-lg flex-shrink-0" />
                     <span className="font-medium truncate">{group.name}</span>
                   </div>
                   {group.unread > 0 && (
@@ -1118,7 +1127,7 @@ const ChatApp = () => {
           >
             <div className="p-4 border-b border-gray-700/50 flex items-center justify-between flex-shrink-0">
               <h3 className="text-white font-semibold flex items-center gap-2">
-                <Hash className="w-5 h-5 text-purple-400" /> Chat Groups
+                <HouseWifi className="w-5 h-5 text-purple-400" /> Chat Groups
               </h3>
               <button
                 className="p-2 rounded-lg hover:bg-slate-700/50 text-white text-lg"
