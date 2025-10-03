@@ -22,7 +22,8 @@ const toggleMobileAd = () => {
   }
 };
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Send, Users, Hash, Plus, Menu, Wifi, WifiOff } from "lucide-react";
+import { Send, Users, Hash, Plus, Menu, Wifi, WifiOff, HouseWifi } from "lucide-react";
+
 import video from "../assets/video.mp4";
 
 // Mock link for demonstration
@@ -1065,7 +1066,7 @@ const ChatApp = () => {
         <div className="hidden md:flex w-64 bg-slate-800/80 backdrop-blur-xl border-l border-purple-500/20 flex-shrink-0 flex-col">
           <div className="p-4 border-b border-gray-700/50 flex-shrink-0">
             <h3 className="text-white font-semibold flex items-center gap-2">
-              <Hash className="w-5 h-5 text-purple-400" /> Chat Groups
+              <HouseWifi className="w-5 h-5 text-purple-400" /> Chat Groups
             </h3>
           </div>
           <div className="flex-1 p-2 space-y-1 overflow-y-auto">
