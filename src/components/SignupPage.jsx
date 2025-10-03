@@ -24,6 +24,7 @@ const SignupPage = () => {
   const [isGoogleDataFilled, setIsGoogleDataFilled] = useState(false);
 
   const navigate = useNavigate();
+
   // Load Google OAuth script
   useEffect(() => {
     const initializeGoogleAuth = () => {
@@ -108,18 +109,22 @@ const SignupPage = () => {
         { headers: { "Content-Type": "application/json" } }
       );
 
+      // Save user info
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.user.id);
       localStorage.setItem("username", res.data.user.username);
 
+      // Show success message and redirect
       setMessage("✅ Signup successful! Redirecting...");
-      setTimeout(() => navigate("/chat"), 1500);
+      setTimeout(() => {
+        navigate("/chat", { replace: true });
+      }, 1500);
     } catch (err) {
       setMessage(
         "❌ Signup failed: " + (err.response?.data?.message || err.message)
       );
     }
-  };
+  }; // ← This closing brace was missing!
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
