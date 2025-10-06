@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const OtpPage = () => {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -7,6 +8,7 @@ const OtpPage = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const inputRefs = useRef([]);
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Simulate fetching email from localStorage
@@ -85,21 +87,15 @@ const OtpPage = () => {
 
       if (response.data.success) {
         setMessage("Password reset successfully! Redirecting to login...");
-
-        // Clear stored email (optional)
-        // localStorage.removeItem("email");
-
-        // Redirect to login after 2 seconds
         setTimeout(() => {
-          // In your actual app: navigate("/login");
           setMessage("Redirected to login page ✓");
+          navigate("/login");
           // For demo purposes, we'll just show a message
         }, 2000);
       } else {
         setMessage(response.data.message || "Failed to reset password");
       }
     } catch (error) {
-      console.error("Error verifying OTP:", error);
       const errorMsg =
         error.response?.data?.message ||
         "Something went wrong. Please try again.";

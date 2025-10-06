@@ -69,7 +69,6 @@ const SignupPage = () => {
         email: email || "",
       }));
       setIsGoogleDataFilled(true);
-      setMessage("✅ Google data loaded! Please add phone number & password.");
     } catch (err) {
       setMessage("❌ Failed to load Google data.");
     }
@@ -147,11 +146,6 @@ const SignupPage = () => {
           <div className="mb-6">
             <div id="google-signin-button" className="w-full"></div>
 
-            <div className="mt-3 text-center text-xs text-gray-400">
-              Google Client ID:{" "}
-              {GOOGLE_CLIENT_ID ? "✅ Configured" : "❌ Missing"}
-            </div>
-
             <div className="flex items-center gap-2 my-6">
               <hr className="flex-grow border-gray-300" />
               <span className="text-gray-400 text-sm">OR</span>
@@ -161,7 +155,6 @@ const SignupPage = () => {
         )}
         {isGoogleDataFilled && (
           <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex justify-between items-center">
-            <span>Data loaded from Google</span>
             <button
               onClick={() => {
                 setFormData({

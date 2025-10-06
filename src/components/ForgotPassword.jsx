@@ -25,8 +25,6 @@ const ForgotPassword = () => {
         }
       );
 
-      console.log("Forgot Password Response:", res.data);
-
       if (res.status === 200) {
         // ✅ Save email in localStorage
         localStorage.setItem("email", email);

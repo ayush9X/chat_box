@@ -36,7 +36,6 @@ const GroupsPage = () => {
       const res = await axios.get(
         `${link}/user/group`
       );
-      console.log("Groups fetched:", res.data);
 
       const fetchedGroups = Array.isArray(res.data.groups)
         ? res.data.groups
@@ -59,7 +58,6 @@ const GroupsPage = () => {
       setGroups(enhancedGroups);
       setFilteredGroups(enhancedGroups);
     } catch (err) {
-      console.error("Error fetching groups:", err);
       showMessage("Error fetching groups", "error");
     } finally {
       setLoading(false);
@@ -139,7 +137,6 @@ const GroupsPage = () => {
         showMessage("Failed to create group", "error");
       }
     } catch (err) {
-      console.error(err);
       showMessage("Error creating group", "error");
     } finally {
       setLoading(false);
@@ -178,7 +175,6 @@ const GroupsPage = () => {
       setEditingGroup(null);
       setShowCreateForm(false);
     } catch (err) {
-      console.error(err);
       showMessage("Error updating group", "error");
     } finally {
       setLoading(false);
@@ -196,7 +192,6 @@ const GroupsPage = () => {
       showMessage("Group deleted successfully!", "success");
       setDeleteConfirm(null);
     } catch (err) {
-      console.error(err);
       showMessage("Error deleting group", "error");
     } finally {
       setLoading(false);

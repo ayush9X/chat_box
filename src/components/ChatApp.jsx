@@ -1,13 +1,6 @@
 const toggleMobileAd = () => {
-  console.log("Toggle button clicked!", {
-    showMobileAd,
-    adPermanentlyHidden,
-    showAdToggle,
-  });
-
   if (adPermanentlyHidden && showAdToggle) {
     // Restore the ad and reset to original behavior
-    console.log("Restoring ads and resetting scroll behavior...");
     setShowMobileAd(true);
     setAdPermanentlyHidden(false);
     setShowAdToggle(false);
@@ -15,7 +8,6 @@ const toggleMobileAd = () => {
     lastScrollTop.current = 0;
   } else if (!adPermanentlyHidden && showMobileAd) {
     // Hide the ad manually
-    console.log("Hiding ads manually...");
     setShowMobileAd(false);
     setAdPermanentlyHidden(true);
     setShowAdToggle(true);
@@ -63,15 +55,8 @@ const ChatApp = () => {
 
   // ✅ Paste toggleMobileAd here
   const toggleMobileAd = () => {
-    console.log("Toggle button clicked!", {
-      showMobileAd,
-      adPermanentlyHidden,
-      showAdToggle,
-    });
-
     if (adPermanentlyHidden && showAdToggle) {
       // Restore the ad and reset to original behavior
-      console.log("Restoring ads and resetting scroll behavior...");
       setShowMobileAd(true);
       setAdPermanentlyHidden(false);
       setShowAdToggle(false);
@@ -79,7 +64,6 @@ const ChatApp = () => {
       lastScrollTop.current = 0;
     } else if (!adPermanentlyHidden && showMobileAd) {
       // Hide the ad manually
-      console.log("Hiding ads manually...");
       setShowMobileAd(false);
       setAdPermanentlyHidden(true);
       setShowAdToggle(true);
@@ -137,7 +121,6 @@ const ChatApp = () => {
             setShowMobileAd(false);
             setAdPermanentlyHidden(true);
             setShowAdToggle(true);
-            console.log("Ads hidden by scroll up");
           }
         } else if (
           currentScrollTop > lastScrollTop.current &&
@@ -193,9 +176,6 @@ const ChatApp = () => {
       setUserID(storedUserId);
       setUsername(storedUsername);
 
-      console.log("🆔 User ID:", storedUserId);
-      console.log("👤 Username:", storedUsername);
-
       initialized = true;
     }
   }, []);
@@ -231,39 +211,29 @@ const ChatApp = () => {
           setSocket(newSocket);
 
           newSocket.on("connect", () => {
-            console.log("🔌 Connected to server via Socket.IO");
             setIsConnected(true);
           });
 
           newSocket.on("disconnect", (reason) => {
-            console.log("🔌 Socket disconnected:", reason);
             setIsConnected(false);
           });
 
           newSocket.on("connect_error", (error) => {
-            console.warn("⚠️ Socket connection error - working in demo mode");
             setIsConnected(false);
           });
 
           newSocket.on("reconnect", (attemptNumber) => {
-            console.log(
-              "🔄 Socket reconnected after",
-              attemptNumber,
-              "attempts"
-            );
             setIsConnected(true);
           });
 
           // Set demo connection after a delay if server is not available
           setTimeout(() => {
             if (!newSocket.connected) {
-              console.log("📱 Working in demo mode - server not available");
               setIsConnected(false);
             }
           }, 5000);
         }
       } catch (error) {
-        console.warn("⚠️ Socket.IO not available - working in demo mode");
         setIsConnected(false);
       }
     };
@@ -281,7 +251,6 @@ const ChatApp = () => {
   // Handle pending messages when connected
   useEffect(() => {
     if (isConnected && pendingMessages.length > 0 && socket) {
-      console.log("📤 Sending pending messages:", pendingMessages.length);
       pendingMessages.forEach((msg) => {
         sendMessageToServer(msg.message, msg.groupID);
       });
@@ -291,7 +260,6 @@ const ChatApp = () => {
 
   const fetchGroups = async () => {
     try {
-      console.log(`🔍 Attempting to fetch groups from: ${link}/user/group`);
       const response = await fetch(`${link}/user/group`, {
         method: "GET",
         headers: {
@@ -301,14 +269,11 @@ const ChatApp = () => {
         mode: "cors",
       });
 
-      console.log(`📡 Server response status: ${response.status}`);
-
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log("📊 Groups data received:", data);
 
       const fetchedGroups = Array.isArray(data.groups)
         ? data.groups
@@ -333,8 +298,6 @@ const ChatApp = () => {
         await fetchChats(firstGroup.id);
       }
     } catch (err) {
-      console.error(`❌ Error fetching groups from ${link}:`, err.message);
-      console.warn("⚠️ Server not available, using demo data");
       const demoGroups = [
         { id: "1", name: "General", icon: "#", active: true, unread: 0 },
         { id: "2", name: "Random", icon: "#", active: false, unread: 2 },
@@ -350,9 +313,6 @@ const ChatApp = () => {
 
   const fetchChats = async (groupId) => {
     try {
-      console.log(
-        `📥 Fetching chats from: ${link}/user/chat?groupID=${groupId}`
-      );
       const response = await fetch(`${link}/user/chat?groupID=${groupId}`, {
         method: "GET",
         headers: {
@@ -361,29 +321,21 @@ const ChatApp = () => {
         },
         mode: "cors",
       });
-
-      console.log(`📡 Chat response status: ${response.status}`);
-
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log("💬 Chat data received:", data);
 
       if (data && Array.isArray(data.chats)) {
         const sortedChats = [...data.chats].sort(
           (a, b) => new Date(a.chat_at) - new Date(b.chat_at)
         );
         setMessages(sortedChats);
-        console.log(`✅ Loaded ${sortedChats.length} messages from API`);
       } else {
         setMessages([]);
-        console.log("📝 No messages found for this group");
       }
     } catch (err) {
-      console.error(`❌ Error fetching chats from ${link}:`, err.message);
-      console.warn("⚠️ Server not available, loading demo messages");
       const demoMessages = [
         {
           sender: "user_1",
@@ -447,7 +399,6 @@ const ChatApp = () => {
         },
       ];
       setMessages(demoMessages);
-      console.log("📝 Loaded demo messages for offline mode");
     }
   };
 
@@ -459,12 +410,9 @@ const ChatApp = () => {
     if (!activeGroup || !socket) return;
 
     const room = `group_${activeGroup.id}`;
-    console.log(`🏠 Joining room: ${room}`);
     socket.emit("join", { room });
 
     const handleMessage = (msg) => {
-      console.log("📨 Real-time message received:", msg);
-
       // ✅ Normalize keys (backend sends {userID, message}, UI expects {sender, chat})
       const formattedMsg = {
         sender: msg.sender,
@@ -476,7 +424,6 @@ const ChatApp = () => {
 
       // ✅ Skip my own messages
       if (String(formattedMsg.sender) === String(username)) {
-        console.log("⏩ Skipping my own echoed message");
         return;
       }
 
@@ -486,7 +433,6 @@ const ChatApp = () => {
     socket.on("receive_message", handleMessage);
 
     return () => {
-      console.log(`🚪 Leaving room: ${room}`);
       socket.off("receive_message", handleMessage);
       socket.emit("leave", { room });
     };
@@ -507,14 +453,11 @@ const ChatApp = () => {
       });
 
       if (response.ok) {
-        console.log("✅ Message sent successfully");
         return true;
       } else {
-        console.warn("⚠️ Server error, message will work in demo mode");
         return true; // Return true for demo mode
       }
     } catch (err) {
-      console.warn("⚠️ Server not available, message added locally");
       return true; // Return true for demo mode
     }
   };
@@ -571,7 +514,6 @@ const ChatApp = () => {
           timestamp: Date.now(),
         },
       ]);
-      console.log("📤 Message queued for sending when connected");
     }
   };
 
@@ -600,7 +542,6 @@ const ChatApp = () => {
     setGroups((prev) => prev.map((g, i) => ({ ...g, active: i === index })));
     setActiveGroup(selectedGroup);
 
-    console.log(`📥 Fetching messages for group: ${selectedGroup.name}`);
     await fetchChats(selectedGroup.id);
   };
 

@@ -35,8 +35,6 @@ const SlackLogin = () => {
       localStorage.setItem("username", res.data.user.username);
 
       setMessage("✅ Login successful! Redirecting...");
-      console.log("Login Response:", res.data);
-
       setTimeout(() => {
         navigate("/chat");
       }, 1500);
