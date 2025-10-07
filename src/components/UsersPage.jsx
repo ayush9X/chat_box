@@ -20,6 +20,10 @@ import {
   UserCheck,
   UserX,
   Clock,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import { linked } from "./link";
 
@@ -28,8 +32,8 @@ const UsersPage = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all"); // all, active, inactive, banned
-  const [sortBy, setSortBy] = useState("name"); // name, email, date, status
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [sortBy, setSortBy] = useState("name");
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [showUserModal, setShowUserModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -37,9 +41,15 @@ const UsersPage = () => {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [perPage, setPerPage] = useState(10);
+
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers(currentPage);
+  }, [currentPage]);
 
   // Filter and sort users
   useEffect(() => {
@@ -73,13 +83,19 @@ const UsersPage = () => {
     setFilteredUsers(filtered);
   }, [users, searchTerm, filterStatus, sortBy]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page = 1) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${linked}/user/allusers`
+        `${linked}/user/allusers?page=${page}&per_page=${perPage}`
       );
       const data = await response.json();
+
+      // Update pagination info
+      setCurrentPage(data.page || 1);
+      setTotalPages(data.total_pages || 1);
+      setTotalUsers(data.total_users || 0);
+      setPerPage(data.per_page || 10);
 
       // Enhance users with additional mock data for better visualization
       const enhancedUsers = (data.users || []).map((user) => ({
@@ -112,6 +128,48 @@ const UsersPage = () => {
     }
   };
 
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      setSelectedUsers([]); // Clear selection when changing pages
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+
+    // Show page numbers with ellipsis
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - 1 && i <= currentPage + 1)
+      ) {
+        pages.push(
+          <button
+            key={i}
+            onClick={() => handlePageChange(i)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              currentPage === i
+                ? "bg-blue-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
+            }`}
+          >
+            {i}
+          </button>
+        );
+      } else if (i === currentPage - 2 || i === currentPage + 2) {
+        pages.push(
+          <span key={i} className="px-2 text-gray-500">
+            ...
+          </span>
+        );
+      }
+    }
+
+    return pages;
+  };
+
   const showMessage = (msg, type = "info") => {
     setMessage(msg);
     setMessageType(type);
@@ -125,7 +183,6 @@ const UsersPage = () => {
     try {
       setActionLoading(true);
 
-      // Mock API calls - replace with actual endpoints
       switch (action) {
         case "activate":
           setUsers((prev) =>
@@ -314,7 +371,8 @@ const UsersPage = () => {
                 User Management
               </h1>
               <p className="text-gray-600 mt-2">
-                Manage users, permissions, and account settings
+                Manage users, permissions, and account settings ({totalUsers}{" "}
+                total users)
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -656,6 +714,90 @@ const UsersPage = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                {/* Page Info */}
+                <div className="text-sm text-gray-600">
+                  Showing page{" "}
+                  <span className="font-semibold">{currentPage}</span> of{" "}
+                  <span className="font-semibold">{totalPages}</span> (
+                  {users.length} users on this page)
+                </div>
+
+                {/* Pagination Buttons */}
+                <div className="flex items-center gap-2">
+                  {/* First Page */}
+                  <button
+                    onClick={() => handlePageChange(1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-gray-300 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
+                    title="First Page"
+                  >
+                    <ChevronsLeft className="w-4 h-4" />
+                  </button>
+
+                  {/* Previous Page */}
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-gray-300 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
+                    title="Previous Page"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  {/* Page Numbers */}
+                  <div className="hidden sm:flex items-center gap-1">
+                    {renderPageNumbers()}
+                  </div>
+
+                  {/* Next Page */}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg border border-gray-300 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
+                    title="Next Page"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+
+                  {/* Last Page */}
+                  <button
+                    onClick={() => handlePageChange(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg border border-gray-300 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
+                    title="Last Page"
+                  >
+                    <ChevronsRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Quick Page Jump */}
+                <div className="flex items-center gap-2">
+                  <label htmlFor="pageJump" className="text-sm text-gray-600">
+                    Go to:
+                  </label>
+                  <input
+                    id="pageJump"
+                    type="number"
+                    min="1"
+                    max={totalPages}
+                    value={currentPage}
+                    onChange={(e) => {
+                      const page = parseInt(e.target.value);
+                      if (page >= 1 && page <= totalPages) {
+                        handlePageChange(page);
+                      }
+                    }}
+                    className="w-16 px-2 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  />
+                </div>
+              </div>
             </div>
           )}
         </div>
