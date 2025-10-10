@@ -28,9 +28,18 @@ import {
 import video from "../assets/video.mp4";
 
 // Mock link for demonstration
-const link = "https://www.joinchat.in";
+const link = "https://joinchat.in/";
 
 const ChatApp = () => {
+  const [aiSummary] = useState({
+    topic: "Event: Win MacBook",
+    description:
+      "People are talking about event in which you can win MacBook and event updates on 6 PM",
+    lastUpdate: new Date().toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  });
   const [currentMessage, setCurrentMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [userID, setUserID] = useState(null);
@@ -1012,13 +1021,15 @@ const ChatApp = () => {
           </div>
         </div>
 
-        {/* Right Sidebar: Groups (Desktop) */}
+        {/* Right Sidebar: Groups + AI Summary (Desktop) */}
         <div className="hidden md:flex w-64 bg-slate-800/80 backdrop-blur-xl border-l border-purple-500/20 flex-shrink-0 flex-col">
+          {/* Groups Section */}
           <div className="p-4 border-b border-gray-700/50 flex-shrink-0">
             <h3 className="text-white font-semibold flex items-center gap-2">
               <HouseWifi className="w-5 h-5 text-purple-400" /> Chat Groups
             </h3>
           </div>
+
           <div className="flex-1 p-2 space-y-1 overflow-y-auto">
             {groups.length === 0 ? (
               <div className="flex items-center justify-center h-full">
@@ -1048,8 +1059,28 @@ const ChatApp = () => {
               ))
             )}
           </div>
+
+          {/* AI Summary Section - At Bottom */}
+          <div className="p-4 border-t border-gray-700/50 flex-shrink-0">
+            <h3 className="text-white font-semibold flex items-center gap-2 mb-3">
+              <span className="text-lg">🤖</span> AI Summary
+            </h3>
+            <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-lg p-3 border border-purple-500/30">
+              <h4 className="text-purple-300 font-semibold text-sm mb-2 flex items-center gap-2">
+                <span>🎯</span> {aiSummary.topic}
+              </h4>
+              <p className="text-gray-300 text-xs leading-relaxed mb-2">
+                {aiSummary.description}
+              </p>
+              <div className="flex items-center justify-between text-xs text-gray-400 mt-2 pt-2 border-t border-purple-500/20">
+                <span>Last updated</span>
+                <span className="text-purple-300">{aiSummary.lastUpdate}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
+        {/* Mobile Groups Drawer */}
         {/* Mobile Groups Drawer */}
         <div
           className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${
@@ -1111,6 +1142,27 @@ const ChatApp = () => {
                   </div>
                 ))
               )}
+            </div>
+
+            {/* AI Summary Section - Mobile - At Bottom */}
+            <div className="p-4 border-t border-gray-700/50 flex-shrink-0">
+              <h3 className="text-white font-semibold flex items-center gap-2 mb-3 text-sm">
+                <span>🤖</span> AI Summary
+              </h3>
+              <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-lg p-3 border border-purple-500/30">
+                <h4 className="text-purple-300 font-semibold text-xs mb-2 flex items-center gap-2">
+                  <span>🎯</span> {aiSummary.topic}
+                </h4>
+                <p className="text-gray-300 text-xs leading-relaxed mb-2">
+                  {aiSummary.description}
+                </p>
+                <div className="flex items-center justify-between text-xs text-gray-400 mt-2 pt-2 border-t border-purple-500/20">
+                  <span>Last updated</span>
+                  <span className="text-purple-300">
+                    {aiSummary.lastUpdate}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
