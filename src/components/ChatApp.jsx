@@ -56,6 +56,11 @@ const ChatApp = () => {
   const [scrollDirection, setScrollDirection] = useState("down");
   const [adPermanentlyHidden, setAdPermanentlyHidden] = useState(false);
   const [showAdToggle, setShowAdToggle] = useState(false);
+  const [activeUsers, setActiveUsers] = useState(128);
+  const [liveVisitors, setLiveVisitors] = useState(() => {
+    // Generate random number between 200-500 on initial load
+    return Math.floor(Math.random() * 301) + 200;
+  });
 
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
@@ -161,6 +166,20 @@ const ChatApp = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+  useEffect(() => {
+    // Update visitor count every 5-10 seconds with small random changes
+    const interval = setInterval(() => {
+      setLiveVisitors((prev) => {
+        // Random change between -5 and +10
+        const change = Math.floor(Math.random() * 16) - 5;
+        const newCount = prev + change;
+        // Ensure it never goes below 200
+        return Math.max(200, newCount);
+      });
+    }, Math.random() * 5000 + 5000); // Random interval between 5-10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Initialize user
   useEffect(() => {
@@ -628,6 +647,12 @@ const ChatApp = () => {
                 </span>
               )}
             </div>
+
+            <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm border border-blue-400/30">
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">Live:</span>
+              <span className="font-bold">{liveVisitors}</span>
+            </div>
             <a
               href="https://t.me/+4aszd823mslmMjBl"
               target="_blank"
@@ -685,6 +710,10 @@ const ChatApp = () => {
                   {pendingMessages.length}
                 </span>
               )}
+            </div>
+            <div className="flex items-center gap-1 px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs border border-blue-400/30">
+              <Users className="w-3 h-3" />
+              <span className="font-semibold">{liveVisitors}</span>
             </div>
           </div>
         </div>
