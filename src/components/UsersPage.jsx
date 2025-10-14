@@ -26,6 +26,8 @@ import {
   ChevronsRight,
 } from "lucide-react";
 import { linked } from "./link";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
@@ -177,6 +179,25 @@ const UsersPage = () => {
       setMessage("");
       setMessageType("");
     }, 5000);
+  };
+
+  const navigate = useNavigate();
+  const navigateToAnotherPage = async (id) => {
+    try {
+      console.log("User ID is", id);
+      const response = await axios.get(`${linked}user/chat/${id}`);
+      const chatData = response.data;
+      console.log("This is data", chatData);
+
+      // Option 1: pass chatData to next page
+      navigate("/admin/chats", { state: { chatData } });
+
+      // Option 2: save to localStorage or context and navigate
+      // localStorage.setItem('chatData', JSON.stringify(chatData));
+      // navigate('/chats');
+    } catch (error) {
+      console.error("Something went wrong", error);
+    }
   };
 
   const handleUserAction = async (action, userId) => {
@@ -696,6 +717,13 @@ const UsersPage = () => {
                                     Make Admin
                                   </button>
                                 )}
+
+                                <button
+                                  onClick={() => navigateToAnotherPage(user.id)}
+                                  className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:bg-red-50"
+                                >
+                                  View Chats
+                                </button>
 
                                 <button
                                   onClick={() =>

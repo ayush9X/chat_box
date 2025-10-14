@@ -9,6 +9,7 @@ import GroupsPage from "./components/GroupsPage";
 import UsersPage from "./components/UsersPage";
 import ForgotPassword from "./components/ForgotPassword";
 import OtpPage from "./components/OtpPage";
+import ChatsPage from "./components/ChatsPage";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="posts" element={<PostsPage />} />
         <Route path="groups" element={<GroupsPage />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="chats" element={<ChatsPage />} />
         <Route index element={<PostsPage />} /> {/* default tab */}
       </Route>
     </Routes>
