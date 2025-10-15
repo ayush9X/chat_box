@@ -731,12 +731,12 @@ const ChatApp = () => {
 
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
               <a
-                href="https://t.me/+4aszd823mslmMjBl"
+                href="https://clickship.in/products/pre-sale-exclusive-fashion-tech-combo-smartwatch-wireless-earbuds-graphic-tee-diwali-festive-gift"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
-                  Join Group
+                  Claim Now
                 </button>
               </a>
             </div>
@@ -778,7 +778,7 @@ const ChatApp = () => {
 
           <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
             <video
-              src="/vd2.mp4" // put vd1.mp4 inside public/ folder
+              src="/vd2.mp4" 
               className="w-full h-full object-cover"
               autoPlay
               loop
@@ -789,12 +789,12 @@ const ChatApp = () => {
 
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
               <a
-                href="https://t.me/+4aszd823mslmMjBl"
+                href="https://clickship.in/collections/mega-mystery-box-10-surprises"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
-                  Join Group
+                  Claim Now
                 </button>
               </a>
             </div>
@@ -802,7 +802,7 @@ const ChatApp = () => {
 
           <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
             <video
-              src="/vd3.mp4" // put vd1.mp4 inside public/ folder
+              src="/vd3.mp4" 
               className="w-full h-full object-cover"
               autoPlay
               loop
@@ -813,12 +813,12 @@ const ChatApp = () => {
 
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
               <a
-                href="https://t.me/+4aszd823mslmMjBl"
+                href="https://clickship.in/products/silver-reward-box-shop-5000-unlock-macbook-startup-funding-chance"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
-                  Join Group
+                  Claim Now
                 </button>
               </a>
             </div>
@@ -843,7 +843,7 @@ const ChatApp = () => {
             {/* Example Ad Block */}
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
               <video
-                src="/vd2.mp4" // make sure vd1.mp4 is inside public/ folder
+                src="/vd2.mp4" 
                 className="w-full h-full object-cover"
                 autoPlay
                 loop
@@ -854,12 +854,12 @@ const ChatApp = () => {
 
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                 <a
-                  href="https://t.me/+4aszd823mslmMjBl"
+                  href="https://clickship.in/collections/mega-mystery-box-10-surprises"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
-                    Join Group
+                    Claim Now
                   </button>
                 </a>
               </div>
@@ -868,7 +868,7 @@ const ChatApp = () => {
             {/* Another Ad */}
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
               <video
-                src="/vd3.mp4" // make sure vd1.mp4 is inside public/ folder
+                src="/vd3.mp4" 
                 className="w-full h-full object-cover"
                 autoPlay
                 loop
@@ -879,12 +879,12 @@ const ChatApp = () => {
 
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                 <a
-                  href="https://t.me/+4aszd823mslmMjBl"
+                  href="https://clickship.in/products/silver-reward-box-shop-5000-unlock-macbook-startup-funding-chance"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
-                    Join Group
+                    Claim Now
                   </button>
                 </a>
               </div>
@@ -892,7 +892,7 @@ const ChatApp = () => {
 
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
               <video
-                src="/vd1.mp4" // video is in public folder
+                src="/vd1.mp4" 
                 className="w-full h-full object-cover"
                 autoPlay
                 loop
@@ -902,12 +902,12 @@ const ChatApp = () => {
 
               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                 <a
-                  href="https://t.me/+4aszd823mslmMjBl"
+                  href="https://clickship.in/products/pre-sale-exclusive-fashion-tech-combo-smartwatch-wireless-earbuds-graphic-tee-diwali-festive-gift"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
-                    Join Group
+                    Claim Now
                   </button>
                 </a>
               </div>
