@@ -735,7 +735,10 @@ const ChatApp = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                <button
+                  className="bg-transparent border border-white text-white px-3 py-1.5 rounded-full 
+                 font-semibold text-xs hover:bg-white/10 hover:text-purple-500 transition-all"
+                >
                   Claim Now
                 </button>
               </a>
@@ -778,7 +781,7 @@ const ChatApp = () => {
 
           <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
             <video
-              src="/vd2.mp4" 
+              src="/vd2.mp4"
               className="w-full h-full object-cover"
               autoPlay
               loop
@@ -793,7 +796,10 @@ const ChatApp = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                <button
+                  className="bg-transparent border border-white text-white px-3 py-1 rounded-full 
+                 font-bold text-xs hover:bg-white/10 hover:text-purple-400 transition-all"
+                >
                   Claim Now
                 </button>
               </a>
@@ -802,7 +808,7 @@ const ChatApp = () => {
 
           <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
             <video
-              src="/vd3.mp4" 
+              src="/vd3.mp4"
               className="w-full h-full object-cover"
               autoPlay
               loop
@@ -817,7 +823,10 @@ const ChatApp = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                <button
+                  className="bg-transparent border border-white text-white px-3 py-1 rounded-full 
+                 font-bold text-xs hover:bg-white/10 hover:text-purple-400 transition-all"
+                >
                   Claim Now
                 </button>
               </a>
@@ -843,7 +852,7 @@ const ChatApp = () => {
             {/* Example Ad Block */}
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
               <video
-                src="/vd2.mp4" 
+                src="/vd2.mp4"
                 className="w-full h-full object-cover"
                 autoPlay
                 loop
@@ -858,7 +867,10 @@ const ChatApp = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                  <button
+                    className="bg-transparent border border-white text-white px-3 py-1 rounded-full 
+                 font-bold text-xs hover:bg-white/10 hover:text-purple-400 transition-all"
+                  >
                     Claim Now
                   </button>
                 </a>
@@ -868,7 +880,7 @@ const ChatApp = () => {
             {/* Another Ad */}
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
               <video
-                src="/vd3.mp4" 
+                src="/vd3.mp4"
                 className="w-full h-full object-cover"
                 autoPlay
                 loop
@@ -883,7 +895,10 @@ const ChatApp = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                  <button
+                    className="bg-transparent border border-white text-white px-3 py-1 rounded-full 
+                 font-bold text-xs hover:bg-white/10 hover:text-purple-400 transition-all"
+                  >
                     Claim Now
                   </button>
                 </a>
@@ -892,7 +907,7 @@ const ChatApp = () => {
 
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
               <video
-                src="/vd1.mp4" 
+                src="/vd1.mp4"
                 className="w-full h-full object-cover"
                 autoPlay
                 loop
@@ -906,7 +921,10 @@ const ChatApp = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <button className="bg-white text-purple-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
+                  <button
+                    className="bg-transparent border border-white text-white px-3 py-1 rounded-full 
+                 font-bold text-xs hover:bg-white/10 hover:text-purple-400 transition-all"
+                  >
                     Claim Now
                   </button>
                 </a>
