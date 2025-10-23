@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Plus,
   MessageSquare,
@@ -11,8 +13,6 @@ import {
   X,
   MoreVertical,
   Filter,
-  Eye, // ADD THIS
-  Download, // ADD THIS
 } from "lucide-react";
 import { link } from "./link";
 
@@ -28,16 +28,14 @@ const GroupsPage = () => {
   const [editingGroup, setEditingGroup] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [sortBy, setSortBy] = useState("recent"); // recent, name, members
-  const [viewMessagesGroup, setViewMessagesGroup] = useState(null);
-  const [groupMessages, setGroupMessages] = useState([]);
-  const [loadingMessages, setLoadingMessages] = useState(false);
-  const [exportFormat, setExportFormat] = useState(null);
 
   // Fetch existing groups
   const fetchGroups = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${link}/user/group`);
+      const res = await axios.get(
+        `${link}/user/group`
+      );
 
       const fetchedGroups = Array.isArray(res.data.groups)
         ? res.data.groups
@@ -118,9 +116,10 @@ const GroupsPage = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post(`${link}/user/group`, {
-        chatTitle: chatTitle.trim(),
-      });
+      const res = await axios.post(
+        `${link}/user/group`,
+        { chatTitle: chatTitle.trim() }
+      );
 
       if (res.data.status === "success") {
         showMessage("Group created successfully!", "success");
@@ -468,15 +467,6 @@ const GroupsPage = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      {/* ADD THIS NEW BUTTON */}
-                      <button
-                        onClick={() => handleViewMessages(group)}
-                        className="p-2 text-gray-400 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-colors"
-                        title="View messages"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-
                       <button
                         onClick={() => handleEdit(group)}
                         className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
@@ -537,159 +527,6 @@ const GroupsPage = () => {
                     Cancel
                   </button>
                 </div>
-              </div>
-            </div>
-          </div>
-        )}
-        {/* View Messages Modal */}
-        {viewMessagesGroup && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col">
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {viewMessagesGroup.chatTitle || viewMessagesGroup.title}
-                  </h2>
-                  <button
-                    onClick={() => {
-                      setViewMessagesGroup(null);
-                      setGroupMessages([]);
-                    }}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600">
-                    {groupMessages.length} messages
-                  </p>
-                  <button
-                    onClick={() => setExportFormat(viewMessagesGroup)}
-                    className="flex items-center gap-2 text-sm bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    Export Messages
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-6">
-                {loadingMessages ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-                  </div>
-                ) : groupMessages.length === 0 ? (
-                  <div className="text-center py-12">
-                    <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-600">No messages yet</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {groupMessages.map((msg) => (
-                      <div
-                        key={msg.id}
-                        className="bg-gray-50 rounded-lg p-4 border border-gray-200"
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                              <span className="text-white text-sm font-medium">
-                                {msg.sender.charAt(0)}
-                              </span>
-                            </div>
-                            <span className="font-medium text-gray-900">
-                              {msg.sender}
-                            </span>
-                          </div>
-                          <span className="text-xs text-gray-500">
-                            {formatDate(msg.timestamp)}
-                          </span>
-                        </div>
-                        <p className="text-gray-700 ml-10">{msg.content}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Export Format Selection Modal */}
-        {exportFormat && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    Export Messages
-                  </h2>
-                  <button
-                    onClick={() => setExportFormat(null)}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
-
-                <p className="text-gray-600 mb-6">
-                  Choose a format to export the group messages
-                </p>
-
-                <div className="space-y-3">
-                  <button
-                    onClick={() => exportMessages("txt", exportFormat)}
-                    className="w-full flex items-center gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <Download className="w-5 h-5 text-gray-600" />
-                    <div className="text-left">
-                      <div className="font-medium text-gray-900">
-                        Text File (.txt)
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Human-readable format
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => exportMessages("csv", exportFormat)}
-                    className="w-full flex items-center gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <Download className="w-5 h-5 text-gray-600" />
-                    <div className="text-left">
-                      <div className="font-medium text-gray-900">
-                        CSV File (.csv)
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Spreadsheet compatible
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => exportMessages("json", exportFormat)}
-                    className="w-full flex items-center gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <Download className="w-5 h-5 text-gray-600" />
-                    <div className="text-left">
-                      <div className="font-medium text-gray-900">
-                        JSON File (.json)
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Structured data format
-                      </div>
-                    </div>
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => setExportFormat(null)}
-                  className="w-full mt-4 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                >
-                  Cancel
-                </button>
               </div>
             </div>
           </div>
