@@ -1,13 +1,11 @@
 const toggleMobileAd = () => {
   if (adPermanentlyHidden && showAdToggle) {
-    // Restore the ad and reset to original behavior
     setShowMobileAd(true);
     setAdPermanentlyHidden(false);
     setShowAdToggle(false);
-    // Reset scroll tracking
+
     lastScrollTop.current = 0;
   } else if (!adPermanentlyHidden && showMobileAd) {
-    // Hide the ad manually
     setShowMobileAd(false);
     setAdPermanentlyHidden(true);
     setShowAdToggle(true);
@@ -26,8 +24,8 @@ import {
 } from "lucide-react";
 
 import video from "../assets/video.mp4";
+import MobileJoinPopup from "./MobileJoinPopup";
 
-// Mock link for demonstration
 const link = "https://joinchat.in/";
 
 const ChatApp = () => {
@@ -58,7 +56,6 @@ const ChatApp = () => {
   const [showAdToggle, setShowAdToggle] = useState(false);
   const [activeUsers, setActiveUsers] = useState(128);
   const [liveVisitors, setLiveVisitors] = useState(() => {
-    // Generate random number between 200-500 on initial load
     return Math.floor(Math.random() * 301) + 200;
   });
 
@@ -67,17 +64,13 @@ const ChatApp = () => {
   const messagesContainerRef = useRef(null);
   const lastScrollTop = useRef(0);
 
-  // ✅ Paste toggleMobileAd here
   const toggleMobileAd = () => {
     if (adPermanentlyHidden && showAdToggle) {
-      // Restore the ad and reset to original behavior
       setShowMobileAd(true);
       setAdPermanentlyHidden(false);
       setShowAdToggle(false);
-      // Reset scroll tracking
       lastScrollTop.current = 0;
     } else if (!adPermanentlyHidden && showMobileAd) {
-      // Hide the ad manually
       setShowMobileAd(false);
       setAdPermanentlyHidden(true);
       setShowAdToggle(true);
@@ -118,7 +111,6 @@ const ChatApp = () => {
     },
   ]);
 
-  // Handle scroll for mobile ad visibility - Hide permanently on first upward scroll
   useEffect(() => {
     const messagesContainer = messagesContainerRef.current;
     if (!messagesContainer) return;
@@ -126,10 +118,8 @@ const ChatApp = () => {
     const handleScroll = () => {
       const currentScrollTop = messagesContainer.scrollTop;
 
-      // Only process scroll events if ad is not permanently hidden
       if (!adPermanentlyHidden) {
         if (currentScrollTop < lastScrollTop.current && currentScrollTop > 0) {
-          // Scrolling up - hide ad permanently
           if (scrollDirection !== "up") {
             setScrollDirection("up");
             setShowMobileAd(false);
@@ -140,7 +130,6 @@ const ChatApp = () => {
           currentScrollTop > lastScrollTop.current &&
           currentScrollTop > 10
         ) {
-          // Scrolling down - only update direction, keep ad visible if not permanently hidden
           if (scrollDirection !== "down") {
             setScrollDirection("down");
           }
@@ -167,10 +156,8 @@ const ChatApp = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
   useEffect(() => {
-    // Update visitor count every 5-10 seconds with small random changes
     const interval = setInterval(() => {
       setLiveVisitors((prev) => {
-        // Random change between -5 and +10
         const change = Math.floor(Math.random() * 16) - 5;
         const newCount = prev + change;
         // Ensure it never goes below 200
@@ -181,9 +168,7 @@ const ChatApp = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Initialize user
   useEffect(() => {
-    // Wrap in a flag so it runs only once in Strict Mode
     let initialized = false;
 
     if (!initialized) {
@@ -191,7 +176,6 @@ const ChatApp = () => {
       let storedUsername = localStorage.getItem("username");
 
       if (!storedUserId) {
-        // generate new unique ID
         storedUserId = Date.now().toString();
         localStorage.setItem("userId", storedUserId);
       }
@@ -208,7 +192,6 @@ const ChatApp = () => {
     }
   }, []);
 
-  // Initialize Socket.IO with better error handling
   useEffect(() => {
     const initializeSocket = async () => {
       try {
@@ -834,6 +817,7 @@ const ChatApp = () => {
           </div>
         </div>
       </div>
+      <MobileJoinPopup/>
 
       {/* Main Chat Container - Permanently expands when mobile ad is hidden */}
       <div
