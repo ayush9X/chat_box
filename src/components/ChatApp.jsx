@@ -610,8 +610,8 @@ const ChatApp = () => {
           <div className="flex items-center gap-2 lg:gap-3">
             <div
               className={`flex items-center gap-2 px-2 lg:px-3 py-1 rounded-full text-xs lg:text-sm ${isConnected
-                  ? "bg-green-500/20 text-green-300"
-                  : "bg-red-500/20 text-red-300"
+                ? "bg-green-500/20 text-green-300"
+                : "bg-red-500/20 text-red-300"
                 }`}
             >
               {isConnected ? (
@@ -663,8 +663,8 @@ const ChatApp = () => {
       {/* Mobile Advertisement Section with One-Time Hide Animation */}
       <div
         className={`md:hidden bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 transition-all duration-500 ease-in-out transform ${showMobileAd && !adPermanentlyHidden
-            ? "translate-y-0 opacity-100 flex-shrink-0 relative"
-            : "-translate-y-full opacity-0 absolute top-0 left-0 right-0 z-10 pointer-events-none"
+          ? "translate-y-0 opacity-100 flex-shrink-0 relative"
+          : "-translate-y-full opacity-0 absolute top-0 left-0 right-0 z-10 pointer-events-none"
           }`}
       >
         <div className="p-3 border-b border-gray-700/50">
@@ -674,8 +674,8 @@ const ChatApp = () => {
             </h3>
             <div
               className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${isConnected
-                  ? "bg-green-500/20 text-green-300"
-                  : "bg-red-500/20 text-red-300"
+                ? "bg-green-500/20 text-green-300"
+                : "bg-red-500/20 text-red-300"
                 }`}
             >
               {isConnected ? (
@@ -915,8 +915,8 @@ const ChatApp = () => {
         {/* Main Chat Area - Permanently expands to full height when mobile ad is hidden */}
         <div
           className={`flex-1 flex flex-col bg-slate-900/50 min-w-0 transition-all duration-500 ease-in-out ${!showMobileAd || adPermanentlyHidden
-              ? "min-h-screen md:min-h-0"
-              : ""
+            ? "min-h-screen md:min-h-0"
+            : ""
             }`}
         >
           {/* Chat Header - Adjusts position when ad is hidden */}
@@ -945,8 +945,8 @@ const ChatApp = () => {
           <div
             ref={messagesContainerRef}
             className={`flex-1 overflow-y-auto p-3 lg:p-4 space-y-4 transition-all duration-500 ease-in-out ${!showMobileAd || adPermanentlyHidden
-                ? "max-h-screen md:max-h-none"
-                : ""
+              ? "max-h-screen md:max-h-none"
+              : ""
               }`}
             style={{ scrollBehavior: "smooth" }}
           >
@@ -963,8 +963,8 @@ const ChatApp = () => {
                   <div
                     key={`${msg.sender}-${msg.chat_at}-${idx}`}
                     className={`flex items-start gap-3 p-3 rounded-lg max-w-[85%] lg:max-w-[80%] transition-all duration-200 ${isMe
-                        ? "bg-purple-800/40 ml-auto flex-row-reverse"
-                        : "hover:bg-slate-800/30"
+                      ? "bg-purple-800/40 ml-auto flex-row-reverse"
+                      : "hover:bg-slate-800/30"
                       }`}
                   >
                     <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white flex-shrink-0">
@@ -1019,8 +1019,8 @@ const ChatApp = () => {
                 onClick={sendMessage}
                 disabled={!currentMessage.trim() || !userID || !activeGroup}
                 className={`p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ${isConnected
-                    ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                    : "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
+                  ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  : "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
                   }`}
                 title={
                   isConnected
@@ -1060,8 +1060,8 @@ const ChatApp = () => {
                 <div
                   key={i}
                   className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${group.active
-                      ? "bg-purple-600/50 text-white"
-                      : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
+                    ? "bg-purple-600/50 text-white"
+                    : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
                     }`}
                   onClick={() => handleGroupClick(i)}
                 >
@@ -1090,7 +1090,14 @@ const ChatApp = () => {
               </h4>
               <p className="text-gray-300 text-xs leading-relaxed mb-2">
                 {aiSummary.description}
-                <p><a href="https://www.codeheaven.in/">Developed by Code Heaven</a></p>
+                <p>
+                  <a
+                    href="https://www.codeheaven.in/"
+                    class="text-amber-500/40 hover:text-amber-400 font-thin transition-colors"
+                  >
+                    Developed by Code Heaven
+                  </a>
+                </p>
               </p>
               <div className="flex items-center justify-between text-xs text-gray-400 mt-2 pt-2 border-t border-purple-500/20">
                 <span>Last updated</span>
@@ -1139,8 +1146,8 @@ const ChatApp = () => {
                   <div
                     key={i}
                     className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${group.active
-                        ? "bg-purple-600/50 text-white"
-                        : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
+                      ? "bg-purple-600/50 text-white"
+                      : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
                       }`}
                     onClick={() => {
                       handleGroupClick(i);
