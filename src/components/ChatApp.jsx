@@ -289,8 +289,8 @@ const ChatApp = () => {
       const fetchedGroups = Array.isArray(data.groups)
         ? data.groups
         : Array.isArray(data.group)
-        ? data.group
-        : [];
+          ? data.group
+          : [];
 
       const formattedGroups = fetchedGroups.map((g) => ({
         ...g,
@@ -577,9 +577,8 @@ const ChatApp = () => {
 
   return (
     <div
-      className={`h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden transition-all duration-500 ease-in-out ${
-        !showMobileAd ? "md:h-screen" : ""
-      }`}
+      className={`h-screen flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden transition-all duration-500 ease-in-out ${!showMobileAd ? "md:h-screen" : ""
+        }`}
     >
       <div className="hidden md:block relative flex-shrink-0 text-white">
         <video
@@ -610,11 +609,10 @@ const ChatApp = () => {
 
           <div className="flex items-center gap-2 lg:gap-3">
             <div
-              className={`flex items-center gap-2 px-2 lg:px-3 py-1 rounded-full text-xs lg:text-sm ${
-                isConnected
+              className={`flex items-center gap-2 px-2 lg:px-3 py-1 rounded-full text-xs lg:text-sm ${isConnected
                   ? "bg-green-500/20 text-green-300"
                   : "bg-red-500/20 text-red-300"
-              }`}
+                }`}
             >
               {isConnected ? (
                 <Wifi className="w-3 h-3 lg:w-4 lg:h-4" />
@@ -664,11 +662,10 @@ const ChatApp = () => {
 
       {/* Mobile Advertisement Section with One-Time Hide Animation */}
       <div
-        className={`md:hidden bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 transition-all duration-500 ease-in-out transform ${
-          showMobileAd && !adPermanentlyHidden
+        className={`md:hidden bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 transition-all duration-500 ease-in-out transform ${showMobileAd && !adPermanentlyHidden
             ? "translate-y-0 opacity-100 flex-shrink-0 relative"
             : "-translate-y-full opacity-0 absolute top-0 left-0 right-0 z-10 pointer-events-none"
-        }`}
+          }`}
       >
         <div className="p-3 border-b border-gray-700/50">
           <div className="flex items-center justify-between">
@@ -676,11 +673,10 @@ const ChatApp = () => {
               🚀 Advertisement
             </h3>
             <div
-              className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                isConnected
+              className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${isConnected
                   ? "bg-green-500/20 text-green-300"
                   : "bg-red-500/20 text-red-300"
-              }`}
+                }`}
             >
               {isConnected ? (
                 <Wifi className="w-3 h-3" />
@@ -817,13 +813,12 @@ const ChatApp = () => {
           </div>
         </div>
       </div>
-      <MobileJoinPopup/>
+      <MobileJoinPopup />
 
       {/* Main Chat Container - Permanently expands when mobile ad is hidden */}
       <div
-        className={`flex flex-1 min-h-0 transition-all duration-500 ease-in-out ${
-          !showMobileAd || adPermanentlyHidden ? "md:flex-1" : ""
-        }`}
+        className={`flex flex-1 min-h-0 transition-all duration-500 ease-in-out ${!showMobileAd || adPermanentlyHidden ? "md:flex-1" : ""
+          }`}
       >
         {/* Left Sidebar: Advertisement (Desktop only) */}
         <div className="hidden md:flex w-64 bg-slate-800/80 backdrop-blur-xl border-r border-purple-500/20 flex-shrink-0 flex-col">
@@ -919,17 +914,15 @@ const ChatApp = () => {
 
         {/* Main Chat Area - Permanently expands to full height when mobile ad is hidden */}
         <div
-          className={`flex-1 flex flex-col bg-slate-900/50 min-w-0 transition-all duration-500 ease-in-out ${
-            !showMobileAd || adPermanentlyHidden
+          className={`flex-1 flex flex-col bg-slate-900/50 min-w-0 transition-all duration-500 ease-in-out ${!showMobileAd || adPermanentlyHidden
               ? "min-h-screen md:min-h-0"
               : ""
-          }`}
+            }`}
         >
           {/* Chat Header - Adjusts position when ad is hidden */}
           <div
-            className={`flex-shrink-0 p-3 lg:p-4 bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 flex items-center justify-between transition-all duration-500 ease-in-out ${
-              !showMobileAd ? "md:static" : ""
-            }`}
+            className={`flex-shrink-0 p-3 lg:p-4 bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 flex items-center justify-between transition-all duration-500 ease-in-out ${!showMobileAd ? "md:static" : ""
+              }`}
           >
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
               <HouseWifi className="w-5 h-5 lg:w-6 lg:h-6 text-purple-400 flex-shrink-0" />
@@ -951,11 +944,10 @@ const ChatApp = () => {
           {/* Messages Container with Scroll Detection - Permanently full height when ad hidden */}
           <div
             ref={messagesContainerRef}
-            className={`flex-1 overflow-y-auto p-3 lg:p-4 space-y-4 transition-all duration-500 ease-in-out ${
-              !showMobileAd || adPermanentlyHidden
+            className={`flex-1 overflow-y-auto p-3 lg:p-4 space-y-4 transition-all duration-500 ease-in-out ${!showMobileAd || adPermanentlyHidden
                 ? "max-h-screen md:max-h-none"
                 : ""
-            }`}
+              }`}
             style={{ scrollBehavior: "smooth" }}
           >
             {messages.length === 0 ? (
@@ -970,11 +962,10 @@ const ChatApp = () => {
                 return (
                   <div
                     key={`${msg.sender}-${msg.chat_at}-${idx}`}
-                    className={`flex items-start gap-3 p-3 rounded-lg max-w-[85%] lg:max-w-[80%] transition-all duration-200 ${
-                      isMe
+                    className={`flex items-start gap-3 p-3 rounded-lg max-w-[85%] lg:max-w-[80%] transition-all duration-200 ${isMe
                         ? "bg-purple-800/40 ml-auto flex-row-reverse"
                         : "hover:bg-slate-800/30"
-                    }`}
+                      }`}
                   >
                     <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white flex-shrink-0">
                       👤
@@ -982,9 +973,8 @@ const ChatApp = () => {
 
                     <div className="flex-1 min-w-0">
                       <div
-                        className={`flex items-center gap-2 mb-1 ${
-                          isMe ? "justify-end flex-row-reverse" : ""
-                        }`}
+                        className={`flex items-center gap-2 mb-1 ${isMe ? "justify-end flex-row-reverse" : ""
+                          }`}
                       >
                         <span className="font-semibold text-white text-sm lg:text-base truncate">
                           {isMe ? "You" : msg.sender}
@@ -1028,11 +1018,10 @@ const ChatApp = () => {
               <button
                 onClick={sendMessage}
                 disabled={!currentMessage.trim() || !userID || !activeGroup}
-                className={`p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ${
-                  isConnected
+                className={`p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ${isConnected
                     ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                     : "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
-                }`}
+                  }`}
                 title={
                   isConnected
                     ? "Send message"
@@ -1070,11 +1059,10 @@ const ChatApp = () => {
               groups.map((group, i) => (
                 <div
                   key={i}
-                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
-                    group.active
+                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${group.active
                       ? "bg-purple-600/50 text-white"
                       : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
-                  }`}
+                    }`}
                   onClick={() => handleGroupClick(i)}
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -1102,6 +1090,7 @@ const ChatApp = () => {
               </h4>
               <p className="text-gray-300 text-xs leading-relaxed mb-2">
                 {aiSummary.description}
+                <p><a href="https://www.codeheaven.in/">Developed by Code Heaven</a></p>
               </p>
               <div className="flex items-center justify-between text-xs text-gray-400 mt-2 pt-2 border-t border-purple-500/20">
                 <span>Last updated</span>
@@ -1114,9 +1103,8 @@ const ChatApp = () => {
         {/* Mobile Groups Drawer */}
         {/* Mobile Groups Drawer */}
         <div
-          className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${
-            showGroups ? "opacity-100 visible" : "opacity-0 invisible"
-          }`}
+          className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${showGroups ? "opacity-100 visible" : "opacity-0 invisible"
+            }`}
         >
           <div
             className="absolute inset-0 bg-black/60"
@@ -1124,9 +1112,8 @@ const ChatApp = () => {
           ></div>
 
           <div
-            className={`absolute right-0 top-0 h-full w-64 bg-slate-800/95 backdrop-blur-xl border-l border-purple-500/20 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col ${
-              showGroups ? "translate-x-0" : "translate-x-full"
-            }`}
+            className={`absolute right-0 top-0 h-full w-64 bg-slate-800/95 backdrop-blur-xl border-l border-purple-500/20 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col ${showGroups ? "translate-x-0" : "translate-x-full"
+              }`}
           >
             <div className="p-4 border-b border-gray-700/50 flex items-center justify-between flex-shrink-0">
               <h3 className="text-white font-semibold flex items-center gap-2">
@@ -1151,11 +1138,10 @@ const ChatApp = () => {
                 groups.map((group, i) => (
                   <div
                     key={i}
-                    className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
-                      group.active
+                    className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${group.active
                         ? "bg-purple-600/50 text-white"
                         : "hover:bg-slate-700/50 text-gray-300 hover:text-white"
-                    }`}
+                      }`}
                     onClick={() => {
                       handleGroupClick(i);
                       setShowGroups(false);
