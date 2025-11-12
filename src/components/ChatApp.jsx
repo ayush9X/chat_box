@@ -11,6 +11,7 @@ const toggleMobileAd = () => {
     setShowAdToggle(true);
   }
 };
+import Linkify from "linkify-react"
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   Send,
@@ -160,10 +161,9 @@ const ChatApp = () => {
       setLiveVisitors((prev) => {
         const change = Math.floor(Math.random() * 16) - 5;
         const newCount = prev + change;
-        // Ensure it never goes below 200
         return Math.max(200, newCount);
       });
-    }, Math.random() * 5000 + 5000); // Random interval between 5-10 seconds
+    }, Math.random() * 5000 + 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -195,7 +195,6 @@ const ChatApp = () => {
   useEffect(() => {
     const initializeSocket = async () => {
       try {
-        // Load Socket.IO dynamically
         if (!window.io) {
           const script = document.createElement("script");
           script.src =
@@ -237,7 +236,6 @@ const ChatApp = () => {
             setIsConnected(true);
           });
 
-          // Set demo connection after a delay if server is not available
           setTimeout(() => {
             if (!newSocket.connected) {
               setIsConnected(false);
@@ -259,7 +257,6 @@ const ChatApp = () => {
     };
   }, []);
 
-  // Handle pending messages when connected
   useEffect(() => {
     if (isConnected && pendingMessages.length > 0 && socket) {
       pendingMessages.forEach((msg) => {
@@ -317,7 +314,6 @@ const ChatApp = () => {
       ];
       setGroups(demoGroups);
       setActiveGroup(demoGroups[0]);
-      // Load demo messages for the first group
       await fetchChats(demoGroups[0].id);
     }
   };
@@ -424,7 +420,6 @@ const ChatApp = () => {
     socket.emit("join", { room });
 
     const handleMessage = (msg) => {
-      // ✅ Normalize keys (backend sends {userID, message}, UI expects {sender, chat})
       const formattedMsg = {
         sender: msg.sender,
         chat: msg.message || msg.chat,
@@ -433,7 +428,6 @@ const ChatApp = () => {
         status: "sent",
       };
 
-      // ✅ Skip my own messages
       if (String(formattedMsg.sender) === String(username)) {
         return;
       }
@@ -466,10 +460,10 @@ const ChatApp = () => {
       if (response.ok) {
         return true;
       } else {
-        return true; // Return true for demo mode
+        return true;
       }
     } catch (err) {
-      return true; // Return true for demo mode
+      return true;
     }
   };
 
@@ -660,7 +654,6 @@ const ChatApp = () => {
         </div>
       )}
 
-      {/* Mobile Advertisement Section with One-Time Hide Animation */}
       <div
         className={`md:hidden bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 transition-all duration-500 ease-in-out transform ${showMobileAd && !adPermanentlyHidden
           ? "translate-y-0 opacity-100 flex-shrink-0 relative"
@@ -699,7 +692,7 @@ const ChatApp = () => {
         <div className="p-3 flex gap-3 overflow-x-auto">
           <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
             <video
-              src="/vd1.mp4" // put vd1.mp4 inside public/ folder
+              src="/vd1.mp4"
               className="w-full h-full object-cover"
               autoPlay
               loop
@@ -723,40 +716,6 @@ const ChatApp = () => {
               </a>
             </div>
           </div>
-
-          {/* <div className="flex-shrink-0 w-48 bg-slate-700/50 rounded-lg p-3 text-gray-200 shadow-md">
-            <div className="text-lg mb-1">📢</div>
-            <h4 className="font-bold text-xs mb-1">Sponsored</h4>
-            <p className="text-xs opacity-80 mb-2">
-              Join our Telegram group for exclusive deals and updates.
-            </p>
-            <a
-              href="https://t.me/+4aszd823mslmMjBl"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-2 py-1 rounded-full font-semibold text-xs hover:opacity-90 transition-all">
-                Join Now
-              </button>
-            </a>
-          </div>
-
-          <div className="flex-shrink-0 w-48 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg p-3 text-white shadow-lg">
-            <div className="text-xl mb-1">💎</div>
-            <h4 className="font-bold text-sm mb-1">Premium</h4>
-            <p className="text-xs opacity-90 mb-2">
-              Unlock all features and get priority support!
-            </p>
-            <a
-              href="https://t.me/+4aszd823mslmMjBl"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="bg-white text-green-600 px-2 py-1 rounded-full font-bold text-xs hover:bg-gray-100 transition-all shadow-md">
-                Upgrade
-              </button>
-            </a>
-          </div> */}
 
           <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
             <video
@@ -820,7 +779,6 @@ const ChatApp = () => {
         className={`flex flex-1 min-h-0 transition-all duration-500 ease-in-out ${!showMobileAd || adPermanentlyHidden ? "md:flex-1" : ""
           }`}
       >
-        {/* Left Sidebar: Advertisement (Desktop only) */}
         <div className="hidden md:flex w-64 bg-slate-800/80 backdrop-blur-xl border-r border-purple-500/20 flex-shrink-0 flex-col">
           <div className="p-4 border-b border-gray-700/50 flex-shrink-0">
             <h3 className="text-white font-semibold flex items-center gap-2">
@@ -828,7 +786,6 @@ const ChatApp = () => {
             </h3>
           </div>
           <div className="flex-1 p-4 space-y-4 overflow-y-auto text-center">
-            {/* Example Ad Block */}
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
               <video
                 src="/vd2.mp4"
@@ -856,7 +813,6 @@ const ChatApp = () => {
               </div>
             </div>
 
-            {/* Another Ad */}
             <div className="relative min-w-48 h-48 rounded-lg overflow-hidden shadow-lg">
               <video
                 src="/vd3.mp4"
@@ -912,14 +868,12 @@ const ChatApp = () => {
           </div>
         </div>
 
-        {/* Main Chat Area - Permanently expands to full height when mobile ad is hidden */}
         <div
           className={`flex-1 flex flex-col bg-slate-900/50 min-w-0 transition-all duration-500 ease-in-out ${!showMobileAd || adPermanentlyHidden
             ? "min-h-screen md:min-h-0"
             : ""
             }`}
         >
-          {/* Chat Header - Adjusts position when ad is hidden */}
           <div
             className={`flex-shrink-0 p-3 lg:p-4 bg-slate-800/90 backdrop-blur-xl border-b border-purple-500/20 flex items-center justify-between transition-all duration-500 ease-in-out ${!showMobileAd ? "md:static" : ""
               }`}
@@ -941,7 +895,6 @@ const ChatApp = () => {
             </button>
           </div>
 
-          {/* Messages Container with Scroll Detection - Permanently full height when ad hidden */}
           <div
             ref={messagesContainerRef}
             className={`flex-1 overflow-y-auto p-3 lg:p-4 space-y-4 transition-all duration-500 ease-in-out ${!showMobileAd || adPermanentlyHidden
@@ -988,9 +941,15 @@ const ChatApp = () => {
                           </span>
                         )}
                       </div>
-                      <p className="text-gray-200 break-words text-sm lg:text-base">
-                        {msg.chat}
-                      </p>
+                      <Linkify
+                        options={{
+                          target: "_blank",
+                          className: "text-blue-400 underline hover:text-blue-300",
+                          rel: "noopener noreferrer",
+                        }}
+                      >
+                        <p className="text-gray-200 break-words text-sm lg:text-base">{msg.chat}</p>
+                      </Linkify>
                     </div>
                   </div>
                 );
@@ -999,10 +958,8 @@ const ChatApp = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Box - Fixed at bottom */}
           <div className="flex-shrink-0 bg-slate-800/90 backdrop-blur-xl border-t border-purple-500/20 p-3 lg:p-4">
             <div className="flex items-center gap-2 lg:gap-3 bg-slate-700/50 rounded-xl p-2 lg:p-3 border border-purple-500/20">
-              {/* <Plus className="w-5 h-5 lg:w-6 lg:h-6 text-gray-400 flex-shrink-0" /> */}
               <input
                 type="text"
                 value={currentMessage}
@@ -1041,9 +998,7 @@ const ChatApp = () => {
           </div>
         </div>
 
-        {/* Right Sidebar: Groups + AI Summary (Desktop) */}
         <div className="hidden md:flex w-64 bg-slate-800/80 backdrop-blur-xl border-l border-purple-500/20 flex-shrink-0 flex-col">
-          {/* Groups Section */}
           <div className="p-4 border-b border-gray-700/50 flex-shrink-0">
             <h3 className="text-white font-semibold flex items-center gap-2">
               <HouseWifi className="w-5 h-5 text-purple-400" /> Chat Groups
@@ -1107,7 +1062,6 @@ const ChatApp = () => {
           </div>
         </div>
 
-        {/* Mobile Groups Drawer */}
         {/* Mobile Groups Drawer */}
         <div
           className={`fixed inset-0 z-50 md:hidden transition-opacity duration-300 ${showGroups ? "opacity-100 visible" : "opacity-0 invisible"
