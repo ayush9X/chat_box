@@ -70,7 +70,7 @@ const ChatPremiumUI = () => {
         if (!currentMessage.trim()) return;
         if (!groupId) return;
 
-        const userID = localStorage.getItem("user_id");
+        const userID = localStorage.getItem("userId");
 
         const payload = {
             userID,
