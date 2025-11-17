@@ -1,27 +1,38 @@
 import React, { useState, useEffect } from "react";
 import logo from "../assets/header.png";
 
-const MobileJoinPopup = () => {
+const MobileJoinPopup = ({ groupId }) => {
     const [visible, setVisible] = useState(false);
+
+    // 🔵 Group-specific links
+    const groupLinks = {
+        1: "https://t.me/+4aszd823mslmMjBl",
+        2: "https://t.me/+abcdef12345",
+        3: "https://t.me/+xyz98765432",
+        default: "https://t.me/+4aszd823mslmMjBl"
+    };
+
+    // 🟢 Pick correct link based on groupId
+    const telegramLink = groupLinks[groupId] || groupLinks.default;
 
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth <= 768) setVisible(true);
-            else setVisible(false);
+            setVisible(window.innerWidth <= 768);
         };
+
         handleResize();
         window.addEventListener("resize", handleResize);
+
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
     if (!visible) return null;
 
-    // 🟢 Replace with your Telegram group link
-    const telegramLink = "https://t.me/+4aszd823mslmMjBl";
-
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-fadeIn">
             <div className="relative w-full max-w-xs bg-gradient-to-br from-white via-white/90 to-blue-50 rounded-3xl shadow-2xl border border-blue-100 p-5 text-center animate-slideUp">
+
+                {/* CLOSE BUTTON */}
                 <button
                     onClick={() => setVisible(false)}
                     className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl font-bold"
@@ -29,6 +40,7 @@ const MobileJoinPopup = () => {
                     ✕
                 </button>
 
+                {/* LOGO */}
                 <div className="flex justify-center mb-3">
                     <img
                         src={logo}
@@ -37,15 +49,18 @@ const MobileJoinPopup = () => {
                     />
                 </div>
 
+                {/* TITLE */}
                 <h2 className="text-xl font-extrabold text-gray-900 mb-2">
                     🚀 Join the Chat Revolution!
                 </h2>
 
+                {/* DESCRIPTION */}
                 <p className="text-gray-600 text-sm font-medium mb-4 leading-relaxed">
                     Meet awesome people 💬, grab exclusive deals 💸, and never miss
                     exciting <span className="font-semibold text-blue-600">events</span> again.
                 </p>
 
+                {/* BUTTON */}
                 <a
                     href={telegramLink}
                     target="_blank"
@@ -58,6 +73,7 @@ const MobileJoinPopup = () => {
                 <p className="text-[12px] text-gray-500 mt-3">
                     ❤️ 20,000+ members already joined
                 </p>
+
             </div>
         </div>
     );

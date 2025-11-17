@@ -1,16 +1,3 @@
-const toggleMobileAd = () => {
-  if (adPermanentlyHidden && showAdToggle) {
-    setShowMobileAd(true);
-    setAdPermanentlyHidden(false);
-    setShowAdToggle(false);
-
-    lastScrollTop.current = 0;
-  } else if (!adPermanentlyHidden && showMobileAd) {
-    setShowMobileAd(false);
-    setAdPermanentlyHidden(true);
-    setShowAdToggle(true);
-  }
-};
 import Linkify from "linkify-react"
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
@@ -306,6 +293,7 @@ const ChatApp = () => {
         await fetchChats(firstGroup.id);
       }
     } catch (err) {
+      console.log(err)
       const demoGroups = [
         { id: "1", name: "General", icon: "#", active: true, unread: 0 },
         { id: "2", name: "Random", icon: "#", active: false, unread: 2 },
@@ -343,69 +331,7 @@ const ChatApp = () => {
         setMessages([]);
       }
     } catch (err) {
-      const demoMessages = [
-        {
-          sender: "user_1",
-          chat: "Welcome to the chat! 🎉",
-          chat_at: new Date(Date.now() - 3600000).toISOString(),
-        },
-        {
-          sender: "user_2",
-          chat: "Thanks! This chat app looks amazing.",
-          chat_at: new Date(Date.now() - 3000000).toISOString(),
-        },
-        {
-          sender: "7",
-          chat: "Hello everyone! Great to be here.",
-          chat_at: new Date(Date.now() - 2400000).toISOString(),
-        },
-        {
-          sender: "user_3",
-          chat: "Has anyone tried the premium features?",
-          chat_at: new Date(Date.now() - 1800000).toISOString(),
-        },
-        {
-          sender: "user_1",
-          chat: "Yes! The themes are really nice 👌",
-          chat_at: new Date(Date.now() - 1200000).toISOString(),
-        },
-        {
-          sender: "7",
-          chat: "I'm thinking about upgrading too",
-          chat_at: new Date(Date.now() - 600000).toISOString(),
-        },
-        {
-          sender: "user_4",
-          chat: "The mobile experience is fantastic!",
-          chat_at: new Date(Date.now() - 300000).toISOString(),
-        },
-        {
-          sender: "7",
-          chat: "Absolutely! The animations are so smooth.",
-          chat_at: new Date(Date.now() - 240000).toISOString(),
-        },
-        {
-          sender: "user_2",
-          chat: "I love how responsive everything feels.",
-          chat_at: new Date(Date.now() - 180000).toISOString(),
-        },
-        {
-          sender: "user_5",
-          chat: "The design is really modern and clean.",
-          chat_at: new Date(Date.now() - 120000).toISOString(),
-        },
-        {
-          sender: "7",
-          chat: "Try scrolling up to see the cool ad animations!",
-          chat_at: new Date(Date.now() - 60000).toISOString(),
-        },
-        {
-          sender: "user_1",
-          chat: "Wow, that's a neat feature! Very polished.",
-          chat_at: new Date(Date.now() - 30000).toISOString(),
-        },
-      ];
-      setMessages(demoMessages);
+      console.log(err)
     }
   };
 
@@ -431,7 +357,6 @@ const ChatApp = () => {
       if (String(formattedMsg.sender) === String(username)) {
         return;
       }
-
       setMessages((prev) => [...prev, formattedMsg]);
     };
 
@@ -441,7 +366,8 @@ const ChatApp = () => {
       socket.off("receive_message", handleMessage);
       socket.emit("leave", { room });
     };
-  }, [activeGroup, socket, userID]);
+  }, [activeGroup, socket, username]);
+
 
   const sendMessageToServer = async (message, groupID) => {
     try {
@@ -463,6 +389,7 @@ const ChatApp = () => {
         return true;
       }
     } catch (err) {
+      console.log(err)
       return true;
     }
   };
@@ -526,19 +453,6 @@ const ChatApp = () => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "online":
-        return "bg-green-400";
-      case "away":
-        return "bg-yellow-400";
-      case "dnd":
-        return "bg-red-400";
-      default:
-        return "bg-gray-400";
     }
   };
 
@@ -752,7 +666,7 @@ const ChatApp = () => {
               loop
               muted
               playsInline
-              poster="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg" // optional fallback image
+              poster="https://www.pixelstalk.net/wp-content/uploads/2016/07/3840x2160-Images-Free-Download.jpg"
             ></video>
 
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -958,6 +872,7 @@ const ChatApp = () => {
             <div ref={messagesEndRef} />
           </div>
 
+
           <div className="flex-shrink-0 bg-slate-800/90 backdrop-blur-xl border-t border-purple-500/20 p-3 lg:p-4">
             <div className="flex items-center gap-2 lg:gap-3 bg-slate-700/50 rounded-xl p-2 lg:p-3 border border-purple-500/20">
               <input
@@ -996,8 +911,11 @@ const ChatApp = () => {
               </p>
             )}
           </div>
+
         </div>
 
+
+        {/* Groups Section  */}
         <div className="hidden md:flex w-64 bg-slate-800/80 backdrop-blur-xl border-l border-purple-500/20 flex-shrink-0 flex-col">
           <div className="p-4 border-b border-gray-700/50 flex-shrink-0">
             <h3 className="text-white font-semibold flex items-center gap-2">
@@ -1061,6 +979,7 @@ const ChatApp = () => {
             </div>
           </div>
         </div>
+
 
         {/* Mobile Groups Drawer */}
         <div

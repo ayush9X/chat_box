@@ -46,10 +46,9 @@ const GroupsPage = () => {
       const fetchedGroups = Array.isArray(res.data.groups)
         ? res.data.groups
         : Array.isArray(res.data.group)
-        ? res.data.group
-        : [];
+          ? res.data.group
+          : [];
 
-      // Add mock data for better visualization (you can remove this)
       const enhancedGroups = fetchedGroups.map((group) => ({
         ...group,
         memberCount: group.memberCount || Math.floor(Math.random() * 50) + 1,
@@ -74,7 +73,6 @@ const GroupsPage = () => {
     fetchGroups();
   }, []);
 
-  // Filter and sort groups
   useEffect(() => {
     let filtered = groups.filter((group) =>
       (group.chatTitle || group.title || "")
@@ -82,7 +80,6 @@ const GroupsPage = () => {
         .includes(searchTerm.toLowerCase())
     );
 
-    // Sort groups
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "name":
@@ -112,7 +109,6 @@ const GroupsPage = () => {
     }, 5000);
   };
 
-  // Handle adding a new group
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!chatTitle.trim()) {
@@ -163,10 +159,6 @@ const GroupsPage = () => {
 
     try {
       setLoading(true);
-      // Add your update API call here
-      // const res = await axios.put(`https://chat-ohmw.onrender.com/user/group/${editingGroup.id}`, { chatTitle });
-
-      // For now, update locally
       setGroups((prev) =>
         prev.map((group) =>
           group.id === editingGroup.id
@@ -189,10 +181,6 @@ const GroupsPage = () => {
   const handleDelete = async (groupId) => {
     try {
       setLoading(true);
-      // Add your delete API call here
-      // await axios.delete(`https://chat-ohmw.onrender.com/user/group/${groupId}`);
-
-      // For now, delete locally
       setGroups((prev) => prev.filter((group) => group.id !== groupId));
       showMessage("Group deleted successfully!", "success");
       setDeleteConfirm(null);
@@ -233,23 +221,21 @@ const GroupsPage = () => {
     }
   };
 
-  // Handle viewing group messages
-const handleViewMessages = async (group) => {
-  setViewMessagesGroup(group); // Open modal
-  setGroupMessages([]); // Clear previous messages
-  setLoadingMessages(true);
+  const handleViewMessages = async (group) => {
+    setViewMessagesGroup(group); // Open modal
+    setGroupMessages([]); // Clear previous messages
+    setLoadingMessages(true);
 
-  try {
-    const res = await axios.get(`${link}/user/group/${group.id}/chats`);
-    setGroupMessages(res.data?.chats || []);
-  } catch (err) {
-    showMessage("Error fetching messages", "error");
-  } finally {
-    setLoadingMessages(false);
-  }
-};
+    try {
+      const res = await axios.get(`${link}/user/group/${group.id}/chats`);
+      setGroupMessages(res.data?.chats || []);
+    } catch (err) {
+      showMessage("Error fetching messages", "error");
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
 
-  
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -280,16 +266,14 @@ const handleViewMessages = async (group) => {
           </div>
         </div>
 
-        {/* Message Alert */}
         {message && (
           <div
-            className={`mb-6 p-4 rounded-lg border flex items-center gap-3 ${
-              messageType === "success"
-                ? "bg-green-50 border-green-200 text-green-800"
-                : messageType === "error"
+            className={`mb-6 p-4 rounded-lg border flex items-center gap-3 ${messageType === "success"
+              ? "bg-green-50 border-green-200 text-green-800"
+              : messageType === "error"
                 ? "bg-red-50 border-red-200 text-red-800"
                 : "bg-blue-50 border-blue-200 text-blue-800"
-            }`}
+              }`}
           >
             {messageType === "success" ? (
               <CheckCircle className="w-5 h-5 flex-shrink-0" />
@@ -308,7 +292,6 @@ const handleViewMessages = async (group) => {
           </div>
         )}
 
-        {/* Create/Edit Form Modal */}
         {showCreateForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
@@ -356,8 +339,8 @@ const handleViewMessages = async (group) => {
                       {loading
                         ? "Processing..."
                         : editingGroup
-                        ? "Update Group"
-                        : "Create Group"}
+                          ? "Update Group"
+                          : "Create Group"}
                     </button>
                     <button
                       type="button"
@@ -377,7 +360,6 @@ const handleViewMessages = async (group) => {
           </div>
         )}
 
-        {/* Search and Filter Bar */}
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
@@ -405,7 +387,6 @@ const handleViewMessages = async (group) => {
           </div>
         </div>
 
-        {/* Groups List */}
         <div className="bg-white rounded-xl shadow-sm border">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
@@ -490,7 +471,6 @@ const handleViewMessages = async (group) => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      {/* ADD THIS NEW BUTTON */}
                       <button
                         onClick={() => handleViewMessages(group)}
                         className="p-2 text-gray-400 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-colors"
@@ -521,7 +501,6 @@ const handleViewMessages = async (group) => {
           )}
         </div>
 
-        {/* Delete Confirmation Modal */}
         {deleteConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
@@ -563,7 +542,6 @@ const handleViewMessages = async (group) => {
             </div>
           </div>
         )}
-        {/* View Messages Modal */}
         {viewMessagesGroup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col">
@@ -638,7 +616,6 @@ const handleViewMessages = async (group) => {
           </div>
         )}
 
-        {/* Export Format Selection Modal */}
         {exportFormat && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
