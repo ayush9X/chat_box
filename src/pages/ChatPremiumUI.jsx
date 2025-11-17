@@ -17,15 +17,17 @@ const ChatPremiumUI = () => {
 
     const { groupId } = useParams();
     const { groups, chats, chatLoading, fetchGroupChats } = useGroupStore();
-
     const [currentMessage, setCurrentMessage] = useState("");
     const [openGroupsMobile, setOpenGroupsMobile] = useState(false);
-
     const messagesEndRef = useRef(null);
 
-    // ---------------------------
-    // LOAD CHATS & JOIN ROOM
-    // ---------------------------
+    const promoLinks = {
+        1: "https://t.me/+group1PromoLink",
+        2: "https://t.me/+group2PromoLink",
+        3: "https://t.me/+group3PromoLink",
+        default: "https://t.me/+defaultPromo"
+    };
+
     useEffect(() => {
         if (groupId) {
             fetchGroupChats(groupId);
@@ -61,6 +63,28 @@ const ChatPremiumUI = () => {
         return () => socket.off("receive_message", handleMessage);
 
     }, [groupId]);
+
+    // AUTO PROMOTIONAL MESSAGE EVERY 3 SECONDS
+    useEffect(() => {
+        if (!groupId) return;
+
+        const interval = setInterval(() => {
+            const promoMessage = {
+                id: Date.now(),
+                chat: `🔥 Special Offer: Check this out → ${promoLinks[groupId] || promoLinks.default}`,
+                sender: "PromoBot",
+                isMe: false,
+                time: new Date().toLocaleTimeString(),
+            };
+
+            useGroupStore.setState((state) => ({
+                chats: [...state.chats, promoMessage]
+            }));
+        }, 3000); // <<<<< 3 seconds
+
+        return () => clearInterval(interval);
+    }, [groupId]);
+
 
 
     const activeGroup = groups.find((g) => String(g.id) === String(groupId));
