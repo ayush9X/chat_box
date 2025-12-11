@@ -25,6 +25,19 @@ const ChatPremiumUI = () => {
         1: "https://t.me/+group1PromoLink",
         2: "https://t.me/+group2PromoLink",
         3: "https://t.me/+group3PromoLink",
+        4: "https://t.me/+group3PromoLink",
+        5: "https://t.me/+group3PromoLink",
+        6: "https://t.me/+group3PromoLink",
+        7: "https://t.me/+group3PromoLink",
+        8: "https://clickship.in/collections/automobile-tools",
+        9: "https://clickship.in/collections/beauty-personal-care-health",
+        10: "https://clickship.in/collections/best-of-gardening",
+        11: "https://clickship.in/collections/best-of-hair-care",
+        12: "https://clickship.in/collections/best-of-kitchen-accessories",
+        13: "https://clickship.in/collections/christmas-magic-collection",
+        14: "https://clickship.in/collections/devotional-jewellery-spiritual-accessories",
+        15: "https://clickship.in/collections/kids-toys-creative-products",
+        16: "https://clickship.in/collections/hot-selling-products",
         default: "https://t.me/+defaultPromo"
     };
 
