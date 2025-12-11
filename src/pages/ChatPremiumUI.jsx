@@ -85,7 +85,7 @@ const ChatPremiumUI = () => {
             const promoMessage = {
                 id: Date.now(),
                 chat: `🔥 Special Offer: Check this out → ${promoLinks[groupId] || promoLinks.default}`,
-                sender: "PromoBot",
+                sender: "Exciting Deals",
                 isMe: false,
                 time: new Date().toLocaleTimeString(),
             };
